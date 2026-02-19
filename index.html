@@ -11,36 +11,33 @@ body {
     color: white;
     font-family: Arial, sans-serif;
     text-align: center;
-    background: #ff0000;
-    overflow-x: hidden;
+    background: #ff0000; /* Fondo rojo flúor */
+    overflow: hidden;
+    position: relative;
 }
 
-/* Líneas cruzadas verde flúor animadas */
-body::before {
+/* Líneas en X verde flúor animadas */
+body::before, body::after {
     content: "";
-    position: fixed;
-    width: 200%;
-    height: 200%;
+    position: absolute;
     top: -50%;
     left: -50%;
-    background: repeating-linear-gradient(
-        45deg,
-        rgba(0, 255, 0, 0.4) 0px,
-        rgba(0, 255, 0, 0.4) 3px,
-        transparent 3px,
-        transparent 40px
-    );
-    animation: moverLineas 5s linear infinite;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(135deg, rgba(0,255,0,0.6) 2px, transparent 2px);
     z-index: -1;
+    animation: moverX 6s linear infinite;
 }
 
-@keyframes moverLineas {
-    0% {
-        transform: translate(0, 0);
-    }
-    100% {
-        transform: translate(200px, 200px);
-    }
+body::after {
+    background: linear-gradient(225deg, rgba(0,255,0,0.6) 2px, transparent 2px);
+    animation: moverX 6s linear infinite reverse;
+}
+
+@keyframes moverX {
+    0% { transform: translate(0, 0); }
+    50% { transform: translate(50px, 50px); }
+    100% { transform: translate(0, 0); }
 }
         }
 
