@@ -4,33 +4,48 @@
     <meta charset="UTF-8">
     <title>ARCHIVOS TODO ROJO</title>
     <style>
-        /* Video de fondo */
-        #fondoVideo {
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            min-width: 100%;
-            min-height: 100%;
-            z-index: -1;
-            object-fit: cover;
-            filter: brightness(0.5); /* oscurece un poco para que los paneles resalten */
-        }
-
+        /* Body y fondo negro */
         body {
             margin: 0;
+            height: 100vh;
             font-family: Arial, sans-serif;
             text-align: center;
             color: white;
-            overflow-x: hidden;
+            overflow: hidden;
+            background-color: #000000; /* fondo negro */
+            position: relative;
         }
 
+        /* Fondo animado con logo FF */
+        body::before {
+            content: "";
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('logoFF.png') repeat; /* logo subido al repo */
+            opacity: 0.1; /* hace que no tape los paneles */
+            background-size: 200px 200px;
+            animation: moverLogo 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes moverLogo {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(100px, 100px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        /* Título */
         h1 {
             color: #ff0000;
             margin-top: 40px;
         }
 
+        /* Paneles */
         .panel {
-            background: rgba(0,0,0,0.7); /* fondo semi-transparente para resaltar sobre el video */
+            background: rgba(0,0,0,0.7); /* semi-transparente para resaltar sobre el fondo */
             margin: 30px auto;
             padding: 20px;
             width: 350px;
@@ -38,6 +53,7 @@
             box-shadow: 0 0 20px #00ff00; /* borde verde flúor */
         }
 
+        /* Botones */
         button {
             background: #00ff00;
             color: black;
@@ -48,11 +64,13 @@
             border-radius: 8px;
         }
 
+        /* Links dentro de panel */
         a {
             color: #00ff00;
             word-break: break-all;
         }
 
+        /* Contraseñas */
         .password {
             margin-top: 15px;
             font-weight: bold;
@@ -62,11 +80,6 @@
 </head>
 
 <body>
-
-<!-- Video de fondo -->
-<video autoplay muted loop id="fondoVideo">
-    <source src="fondoTikTok.mp4" type="video/mp4">
-</video>
 
 <h1>🔥 ARCHIVOS TODO ROJO 🔥</h1>
 
