@@ -1,173 +1,120 @@
+
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>¿Me conocés bien? 🔥</title>
-
-<style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: linear-gradient(135deg, #ff416c, #ff4b2b);
-  color: white;
-  text-align: center;
-}
-
-#game {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-h1 {
-  font-size: 35px;
-}
-
-.question {
-  font-size: 24px;
-  margin: 20px;
-}
-
-button {
-  padding: 15px 25px;
-  margin: 10px;
-  font-size: 18px;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-button:hover {
-  transform: scale(1.1);
-}
-
-#result {
-  font-size: 28px;
-  margin-top: 20px;
-}
-</style>
+  <title>IA PRO WEB</title>
+  <style>
+    body { background:#0f0f0f; color:white; font-family:Arial; }
+    #chat { max-width:700px; margin:auto; height:70vh; overflow-y:auto; }
+    .msg { padding:10px; margin:8px; border-radius:10px; }
+    .user { background:#1e1e1e; text-align:right; }
+    .ai { background:#333; }
+    input, button { padding:10px; margin:5px; }
+  </style>
 </head>
-
 <body>
 
-<div id="game">
-  <h1>🔥 ¿Me conocés bien? 🔥</h1>
-  <div class="question" id="question"></div>
-  <div id="answers"></div>
-  <div id="result"></div>
+<h2 style="text-align:center;">IA Nivel Dios</h2>
+
+<div id="chat"></div>
+
+<div style="text-align:center;">
+  <input id="input" placeholder="Escribe..." />
+  <button onclick="enviar()">Enviar</button>
+
+  <br>
+  <input type="file" id="pdfFile" />
+  <button onclick="leerPDF()">Cargar PDF</button>
+
+  <br>
+  <button onclick="imagen()">Generar Imagen</button>
 </div>
 
 <script>
+const API_KEY = "TU_API_KEY"; // ⚠️ NO seguro en producción
 
-const quiz = [
-  {
-    q: "¿Cuál es mi color favorito?",
-    a: ["Rojo", "Negro", "Azul"],
-    correcta: 1
-  },
-  {
-    q: "¿Qué me gusta hacer más?",
-    a: ["Salir", "Programar", "Dormir"],
-    correcta: 1
-  },
-  {
-    q: "¿Mi comida favorita?",
-    a: ["Pizza", "Pastel de papa", "Hamburguesa"],
-    correcta: 1
-  },
-  {
-    q: "¿Qué prefiero?",
-    a: ["Salir", "Programar", "Deporte"],
-    correcta: 1
-  },
-  {
-    q: "¿Qué me gusta más?",
-    a: ["Videojuegos", "Música y películas", "Deporte"],
-    correcta: 1
-  },
-  {
-    q: "¿Mi bebida favorita?",
-    a: ["Agua", "Coca Cola", "Jugo"],
-    correcta: 1
-  },
-  {
-    q: "¿Tengo hobby?",
-    a: ["Fútbol", "Ninguno", "Dibujar"],
-    correcta: 1
-  },
-  {
-    q: "¿Mi lugar favorito?",
-    a: ["Buenos Aires", "Mendoza", "Chile"],
-    correcta: 1
-  },
-  {
-    q: "¿Qué me hace reír?",
-    a: ["Series", "Videos de TikTok", "Juegos"],
-    correcta: 1
-  },
-  {
-    q: "¿Qué es lo más importante para mí?",
-    a: ["Dinero", "Familia", "Fama"],
-    correcta: 1
-  }
-];
+let memoria = JSON.parse(localStorage.getItem("chat")) || [];
+let pdfTexto = "";
 
-let current = 0;
-let score = 0;
+function guardar() {
+  localStorage.setItem("chat", JSON.stringify(memoria));
+}
 
-function loadQuestion() {
-  const q = quiz[current];
-  document.getElementById("question").textContent = q.q;
+function agregar(texto, clase) {
+  const div = document.createElement("div");
+  div.className = "msg " + clase;
+  div.innerText = texto;
+  document.getElementById("chat").appendChild(div);
+}
 
-  const answersDiv = document.getElementById("answers");
-  answersDiv.innerHTML = "";
+// 📄 Leer PDF (solo cliente)
+async function leerPDF() {
+  const file = document.getElementById("pdfFile").files[0];
+  const reader = new FileReader();
 
-  q.a.forEach((ans, index) => {
-    const btn = document.createElement("button");
-    btn.textContent = ans;
-    btn.onclick = () => check(index);
-    answersDiv.appendChild(btn);
+  reader.onload = function() {
+    pdfTexto = reader.result.slice(0, 3000);
+    alert("PDF cargado (texto básico)");
+  };
+
+  reader.readAsText(file);
+}
+
+// 🤖 Chat
+async function enviar() {
+  const input = document.getElementById("input").value;
+  agregar(input, "user");
+
+  memoria.push(input);
+  guardar();
+
+  const contexto = pdfTexto ? "PDF: " + pdfTexto : "";
+
+  const res = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + API_KEY
+    },
+    body: JSON.stringify({
+      model: "gpt-4.1-mini",
+      input: contexto + "\n" + memoria.slice(-5).join("\n")
+    })
   });
+
+  const data = await res.json();
+  const respuesta = data.output[0].content[0].text;
+
+  agregar(respuesta, "ai");
+
+  memoria.push(respuesta);
+  guardar();
 }
 
-function check(index) {
-  if (index === quiz[current].correcta) {
-    score++;
-  }
+// 🖼️ Imagen
+async function imagen() {
+  const prompt = prompt("Describe la imagen:");
 
-  current++;
+  const res = await fetch("https://api.openai.com/v1/images/generations", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + API_KEY
+    },
+    body: JSON.stringify({
+      model: "gpt-image-1",
+      prompt: prompt
+    })
+  });
 
-  if (current < quiz.length) {
-    loadQuestion();
-  } else {
-    showResult();
-  }
+  const data = await res.json();
+
+  const img = document.createElement("img");
+  img.src = data.data[0].url;
+  img.style.width = "300px";
+
+  document.getElementById("chat").appendChild(img);
 }
-
-function showResult() {
-  document.getElementById("question").textContent = "";
-  document.getElementById("answers").innerHTML = "";
-
-  let msg = "";
-
-  if (score === quiz.length) {
-    msg = "💎 SOS MI MEJOR AMIGO";
-  } else if (score >= 7) {
-    msg = "😎 ME CONOCÉS MUY BIEN";
-  } else if (score >= 4) {
-    msg = "🙂 ME CONOCÉS UN POCO";
-  } else {
-    msg = "😅 TENÉS QUE CONOCERME MÁS";
-  }
-
-  document.getElementById("result").textContent =
-    msg + " (" + score + "/10)";
-}
-
-loadQuestion();
-
 </script>
 
 </body>
