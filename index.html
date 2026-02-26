@@ -1,148 +1,184 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Juego Pro 💰🔥</title>
-
+<title>Gashiras Devil</title>
 <style>
-body {
-  margin: 0;
-  overflow: hidden;
-  font-family: Arial;
-  background: linear-gradient(180deg, #141e30, #243b55);
-}
-
-#player {
-  width: 70px;
-  height: 70px;
-  background: lime;
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-radius: 15px;
-}
-
-.item {
-  width: 40px;
-  height: 40px;
-  position: absolute;
-  top: 0;
-  border-radius: 50%;
-}
-
-.coin {
-  background: gold;
-}
-
-.bomb {
-  background: red;
-}
-
-#score, #level {
-  position: absolute;
-  top: 10px;
-  font-size: 22px;
-  color: white;
-}
-
-#score { left: 10px; }
-#level { right: 10px; }
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: black;
+  }
+  canvas {
+    display: block;
+    background: linear-gradient(#111, #222);
+  }
 </style>
 </head>
-
 <body>
 
-<div id="score">Puntos: 0</div>
-<div id="level">Nivel: 1</div>
-<div id="player"></div>
+<canvas id="game"></canvas>
 
-<!-- sonidos -->
-<audio id="coinSound" src="https://assets.mixkit.co/sfx/preview/mixkit-coin-win-1998.mp3"></audio>
-<audio id="boomSound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-explosion-2759.mp3"></audio>
+<audio id="bgMusic" loop>
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+</audio>
 
 <script>
-let player = document.getElementById("player");
-let score = 0;
-let speed = 3;
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let player = {
+  x: 50,
+  y: 300,
+  w: 30,
+  h: 30,
+  dy: 0,
+  gravity: 0.6,
+  jump: -12,
+  grounded: false
+};
+
 let level = 1;
 
-const coinSound = document.getElementById("coinSound");
-const boomSound = document.getElementById("boomSound");
+let keys = {};
 
-// mover jugador
-document.addEventListener("mousemove", e => {
-  player.style.left = e.clientX - 35 + "px";
+document.addEventListener("keydown", e => {
+  keys[e.key] = true;
+
+  // activar música
+  document.getElementById("bgMusic").play();
 });
 
-function createItem() {
-  let item = document.createElement("div");
-  item.classList.add("item");
+document.addEventListener("keyup", e => {
+  keys[e.key] = false;
+});
 
-  let isBomb = Math.random() < 0.3 + level * 0.05;
+let platforms = [];
+let spikes = [];
 
-  if (isBomb) {
-    item.classList.add("bomb");
-  } else {
-    item.classList.add("coin");
+function generateLevel() {
+  platforms = [];
+  spikes = [];
+
+  for (let i = 0; i < 5 + level; i++) {
+    let x = 150 * i + 200;
+    let y = Math.random() * (canvas.height - 200) + 100;
+
+    platforms.push({ x, y, w: 100, h: 20 });
+
+    // trampas locas
+    if (Math.random() < 0.5) {
+      spikes.push({ x: x + 30, y: y - 20, w: 40, h: 20 });
+    }
+  }
+}
+
+generateLevel();
+
+function reset() {
+  player.x = 50;
+  player.y = 300;
+  player.dy = 0;
+  generateLevel();
+}
+
+function update() {
+  // movimiento
+  if (keys["ArrowRight"]) player.x += 5;
+  if (keys["ArrowLeft"]) player.x -= 5;
+
+  // salto
+  if (keys[" "] && player.grounded) {
+    player.dy = player.jump;
+    player.grounded = false;
   }
 
-  item.style.left = Math.random() * window.innerWidth + "px";
-  document.body.appendChild(item);
+  // gravedad
+  player.dy += player.gravity;
+  player.y += player.dy;
 
-  let fall = setInterval(() => {
-    let top = parseInt(item.style.top || 0);
-    item.style.top = top + speed + "px";
+  player.grounded = false;
 
-    let playerRect = player.getBoundingClientRect();
-    let itemRect = item.getBoundingClientRect();
-
+  // colisiones plataformas
+  platforms.forEach(p => {
     if (
-      itemRect.bottom > playerRect.top &&
-      itemRect.left < playerRect.right &&
-      itemRect.right > playerRect.left
+      player.x < p.x + p.w &&
+      player.x + player.w > p.x &&
+      player.y < p.y + p.h &&
+      player.y + player.h > p.y
     ) {
-      if (item.classList.contains("coin")) {
-        score++;
-        coinSound.play();
-      } else {
-        boomSound.play();
-        setTimeout(() => {
-          alert("💣 Perdiste! Nivel: " + level + " | Puntos: " + score);
-          location.reload();
-        }, 200);
-      }
-
-      document.getElementById("score").textContent = "Puntos: " + score;
-      item.remove();
-      clearInterval(fall);
+      player.y = p.y - player.h;
+      player.dy = 0;
+      player.grounded = true;
     }
+  });
 
-    if (top > window.innerHeight) {
-      item.remove();
-      clearInterval(fall);
+  // trampas
+  spikes.forEach(s => {
+    if (
+      player.x < s.x + s.w &&
+      player.x + player.w > s.x &&
+      player.y < s.y + s.h &&
+      player.y + player.h > s.y
+    ) {
+      alert("💀 Perdiste!");
+      reset();
     }
+  });
 
-  }, 20);
-}
+  // suelo falso 😈
+  if (Math.random() < 0.01 * level) {
+    platforms.pop();
+  }
 
-// niveles
-function updateLevel() {
-  let newLevel = Math.floor(score / 5) + 1;
+  // ganar nivel
+  if (player.x > canvas.width - 50) {
+    level++;
+    alert("🔥 Nivel " + level);
+    reset();
+  }
 
-  if (newLevel !== level) {
-    level = newLevel;
-    speed += 1;
-    document.getElementById("level").textContent = "Nivel: " + level;
-
-    alert("🔥 Subiste a nivel " + level);
+  // caída
+  if (player.y > canvas.height) {
+    reset();
   }
 }
 
-setInterval(() => {
-  createItem();
-  updateLevel();
-}, 900);
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // jugador
+  ctx.fillStyle = "white";
+  ctx.fillRect(player.x, player.y, player.w, player.h);
+
+  // plataformas
+  ctx.fillStyle = "green";
+  platforms.forEach(p => {
+    ctx.fillRect(p.x, p.y, p.w, p.h);
+  });
+
+  // spikes
+  ctx.fillStyle = "red";
+  spikes.forEach(s => {
+    ctx.fillRect(s.x, s.y, s.w, s.h);
+  });
+
+  // nivel
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+  ctx.fillText("Nivel: " + level, 20, 30);
+}
+
+function gameLoop() {
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
 </script>
 
 </body>
