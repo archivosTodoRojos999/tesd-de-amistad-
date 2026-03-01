@@ -1,281 +1,138 @@
-  
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Gashiras Devil</title>
+<title>Casa del Terror</title>
 <style>
-body {
-  margin: 0;
-  overflow: hidden;
-  background: #8b5a00;
-}
-
-canvas {
-  display: block;
-}
-
-.controls {
-  position: fixed;
-  bottom: 20px;
+body { margin: 0; overflow: hidden; background: black; }
+#mensaje {
+  position: absolute;
+  top: 20px;
   width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 40px;
-}
-
-.btn {
-  width: 70px;
-  height: 70px;
-  background: #c68c3c;
-  border: 4px solid #a06a2a;
-  border-radius: 10px;
-  font-size: 30px;
-}
-
-.jump {
-  position: fixed;
-  right: 30px;
-  bottom: 120px;
+  text-align: center;
+  color: white;
+  font-size: 20px;
 }
 </style>
 </head>
-
 <body>
 
-<canvas id="game"></canvas>
+<div id="mensaje">Encuentra la salida... (WASD para moverte)</div>
 
-<div class="controls">
-  <button class="btn" id="left">⬅️</button>
-  <button class="btn" id="right">➡️</button>
-</div>
-
-<button class="btn jump" id="jump">⬆️</button>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+let scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000);
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+let renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-let player = {
-  x: 50,
-  y: 300,
-  w: 15,
-  h: 25,
-  dy: 0,
-  gravity: 0.6,
-  jump: -10,
-  grounded: false
-};
+// luz tenue
+let light = new THREE.PointLight(0xaaaaaa, 0.5);
+light.position.set(0,2,0);
+scene.add(light);
 
-let keys = { left:false, right:false, jump:false };
+// piso
+let floor = new THREE.Mesh(
+  new THREE.BoxGeometry(20,1,20),
+  new THREE.MeshStandardMaterial({color: 0x111111})
+);
+floor.position.y = -1;
+scene.add(floor);
 
-let ground = {
-  x: 0,
-  y: canvas.height / 2,
-  w: canvas.width,
-  h: 100
-};
-
-let door = {
-  x: canvas.width - 80,
-  y: ground.y - 40,
-  w: 30,
-  h: 40
-};
-
-// 😈 trampas
-let spikes = [];
-let fallingBlocks = [];
-let fakeGround = false;
-let invisibleWall = false;
-let reverseControls = false;
-
-// controles táctiles
-left.ontouchstart = ()=> keys.left=true;
-left.ontouchend = ()=> keys.left=false;
-
-right.ontouchstart = ()=> keys.right=true;
-right.ontouchend = ()=> keys.right=false;
-
-jump.ontouchstart = ()=> keys.jump=true;
-jump.ontouchend = ()=> keys.jump=false;
-
-// teclado
-document.addEventListener("keydown", e=>{
-  if(e.key==="ArrowLeft") keys.left=true;
-  if(e.key==="ArrowRight") keys.right=true;
-  if(e.key===" ") keys.jump=true;
-});
-
-document.addEventListener("keyup", e=>{
-  if(e.key==="ArrowLeft") keys.left=false;
-  if(e.key==="ArrowRight") keys.right=false;
-  if(e.key===" ") keys.jump=false;
-});
-
-function reset(){
-  player.x = 50;
-  player.y = ground.y - player.h;
-  spikes = [];
-  fallingBlocks = [];
-  fakeGround = false;
-  invisibleWall = false;
-  reverseControls = false;
+// paredes (casa)
+function wall(x,z){
+  let w = new THREE.Mesh(
+    new THREE.BoxGeometry(20,5,1),
+    new THREE.MeshStandardMaterial({color: 0x222222})
+  );
+  w.position.set(x,2,z);
+  scene.add(w);
 }
+wall(0,-10);
+wall(0,10);
 
-// 🔥 UPDATE
-function update(){
+let sideWall1 = new THREE.Mesh(
+  new THREE.BoxGeometry(1,5,20),
+  new THREE.MeshStandardMaterial({color: 0x222222})
+);
+sideWall1.position.set(-10,2,0);
+scene.add(sideWall1);
 
-  let speed = 4;
+let sideWall2 = sideWall1.clone();
+sideWall2.position.x = 10;
+scene.add(sideWall2);
 
-  // 😈 controles invertidos random
-  if (Math.random() < 0.002) {
-    reverseControls = !reverseControls;
-  }
+// puerta salida
+let door = new THREE.Mesh(
+  new THREE.BoxGeometry(2,3,0.5),
+  new THREE.MeshStandardMaterial({color: 0x00ff00})
+);
+door.position.set(0,1.5,-9);
+scene.add(door);
 
-  if (reverseControls) {
-    if (keys.left) player.x += speed;
-    if (keys.right) player.x -= speed;
-  } else {
-    if (keys.left) player.x -= speed;
-    if (keys.right) player.x += speed;
-  }
+// enemigo (la "vieja")
+let enemy = new THREE.Mesh(
+  new THREE.SphereGeometry(0.7),
+  new THREE.MeshStandardMaterial({color: 0xff0000})
+);
+enemy.position.set(5,1,5);
+scene.add(enemy);
 
-  // salto
-  if (keys.jump && player.grounded) {
-    player.dy = player.jump;
-    player.grounded = false;
-  }
+camera.position.y = 1.5;
 
-  player.dy += player.gravity;
-  player.y += player.dy;
+// controles
+let keys = {};
 
-  player.grounded = false;
+document.addEventListener("keydown", e => keys[e.key.toLowerCase()] = true);
+document.addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
 
-  // 😈 suelo falso
-  if (player.x > canvas.width/2 && !fakeGround) {
-    fakeGround = true;
-  }
+// mouse cámara
+document.addEventListener("mousemove", e=>{
+  camera.rotation.y -= e.movementX * 0.002;
+});
 
-  if (!fakeGround) {
-    if (player.y + player.h >= ground.y) {
-      player.y = ground.y - player.h;
-      player.dy = 0;
-      player.grounded = true;
-    }
-  }
+// loop
+function animate(){
+  requestAnimationFrame(animate);
 
-  // 😈 pared invisible
-  if (Math.random() < 0.003) {
-    invisibleWall = true;
-  }
+  let speed = 0.1;
 
-  if (invisibleWall && player.x > canvas.width/3) {
-    player.x -= 5;
-  }
+  if(keys["w"]) camera.position.z -= speed;
+  if(keys["s"]) camera.position.z += speed;
+  if(keys["a"]) camera.position.x -= speed;
+  if(keys["d"]) camera.position.x += speed;
 
-  // 😈 spikes random
-  if (Math.random() < 0.02) {
-    spikes.push({
-      x: Math.random()*canvas.width,
-      y: ground.y-20,
-      w:20,
-      h:20
-    });
-  }
-
-  spikes.forEach(s=>{
-    if(
-      player.x < s.x+s.w &&
-      player.x+player.w > s.x &&
-      player.y < s.y+s.h &&
-      player.y+player.h > s.y
-    ){
-      alert("💀 Pinchos troll!");
-      reset();
-    }
-  });
-
-  // 😈 bloques que caen
-  if (Math.random() < 0.02) {
-    fallingBlocks.push({
-      x: Math.random()*canvas.width,
-      y: 0,
-      w:30,
-      h:30,
-      dy:4
-    });
-  }
-
-  fallingBlocks.forEach(b=>{
-    b.y += b.dy;
-
-    if(
-      player.x < b.x+b.w &&
-      player.x+player.w > b.x &&
-      player.y < b.y+b.h &&
-      player.y+player.h > b.y
-    ){
-      alert("💀 Te cayó algo!");
-      reset();
-    }
-  });
+  // enemigo te sigue 😈
+  enemy.position.x += (camera.position.x - enemy.position.x) * 0.01;
+  enemy.position.z += (camera.position.z - enemy.position.z) * 0.01;
 
   // perder
-  if (player.y > canvas.height){
-    alert("💀 Caíste!");
-    reset();
+  let dx = enemy.position.x - camera.position.x;
+  let dz = enemy.position.z - camera.position.z;
+  let dist = Math.sqrt(dx*dx + dz*dz);
+
+  if(dist < 1){
+    alert("💀 Te atrapó!");
+    location.reload();
   }
 
   // ganar
   if(
-    player.x < door.x+door.w &&
-    player.x+player.w > door.x &&
-    player.y < door.y+door.h &&
-    player.y+player.h > door.y
+    Math.abs(camera.position.x - door.position.x) < 1 &&
+    Math.abs(camera.position.z - door.position.z) < 1
   ){
-    alert("🔥 Ganaste nivel troll!");
-    reset();
-  }
-}
-
-// 🎨 DIBUJO
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  ctx.fillStyle="#f0b35a";
-  if(!fakeGround){
-    ctx.fillRect(ground.x,ground.y,ground.w,ground.h);
+    alert("🚪 Escapaste!");
+    location.reload();
   }
 
-  ctx.fillStyle="red";
-  spikes.forEach(s=>{
-    ctx.fillRect(s.x,s.y,s.w,s.h);
-  });
-
-  ctx.fillStyle="gray";
-  fallingBlocks.forEach(b=>{
-    ctx.fillRect(b.x,b.y,b.w,b.h);
-  });
-
-  ctx.fillStyle="#ccc";
-  ctx.fillRect(door.x,door.y,door.w,door.h);
-
-  ctx.fillStyle="black";
-  ctx.fillRect(player.x,player.y,player.w,player.h);
+  renderer.render(scene, camera);
 }
 
-function loop(){
-  update();
-  draw();
-  requestAnimationFrame(loop);
-}
-
-reset();
-loop();
+animate();
 </script>
 
 </body>
