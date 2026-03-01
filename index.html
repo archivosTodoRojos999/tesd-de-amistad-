@@ -1,159 +1,379 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Casa del Terror PRO</title>
-<style>
-body { margin:0; overflow:hidden; background:black; }
-#info {
-  position:absolute;
-  top:10px;
-  width:100%;
-  text-align:center;
-  color:white;
-  font-family:Arial;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preguntados - Versión Clon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #1a237e;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #ffd600;
+            font-size: 2.5rem;
+        }
+
+        .puntaje {
+            font-size: 1.5rem;
+            margin-top: 10px;
+            background-color: #0d47a1;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        /* Pantalla de categorías */
+        .categorias-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .categoria {
+            background-color: #283593;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            border: 2px solid #ffd600;
+        }
+
+        .categoria:hover {
+            transform: scale(1.05);
+            background-color: #3949ab;
+        }
+
+        .categoria h2 {
+            color: #ffd600;
+            margin-bottom: 10px;
+        }
+
+        /* Pantalla de pregunta */
+        .pregunta-container {
+            max-width: 600px;
+            width: 100%;
+            background-color: #283593;
+            border-radius: 15px;
+            padding: 30px;
+            display: none;
+        }
+
+        .pregunta-texto {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            text-align: center;
+            min-height: 60px;
+        }
+
+        .opciones-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .opcion {
+            background-color: #0d47a1;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-align: center;
+        }
+
+        .opcion:hover {
+            background-color: #1976d2;
+        }
+
+        .opcion.correcta {
+            background-color: #2e7d32;
+        }
+
+        .opcion.incorrecta {
+            background-color: #c62828;
+        }
+
+        /* Botón de siguiente */
+        .siguiente-btn {
+            background-color: #ffd600;
+            color: #1a237e;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 25px;
+            display: none;
+        }
+
+        .siguiente-btn:hover {
+            background-color: #ffee58;
+        }
+
+        /* Pantalla final */
+        .final-container {
+            max-width: 600px;
+            width: 100%;
+            background-color: #283593;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            display: none;
+        }
+
+        .final-container h2 {
+            color: #ffd600;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .reiniciar-btn {
+            background-color: #ffd600;
+            color: #1a237e;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 25px;
+        }
+    </style>
 </head>
 <body>
+    <header>
+        <h1>PREGUNTADOS</h1>
+        <div class="puntaje">Puntaje: <span id="puntaje">0</span></div>
+    </header>
 
-<div id="info">🔦 Encuentra la salida antes que te atrape...</div>
+    <!-- Pantalla de categorías -->
+    <div class="categorias-container" id="categorias">
+        <div class="categoria" data-categoria="ciencia">
+            <h2>CIENCIA</h2>
+            <p>¿Sabes de física, química y biología?</p>
+        </div>
+        <div class="categoria" data-categoria="historia">
+            <h2>HISTORIA</h2>
+            <p>¿Conoces los hechos clave del pasado?</p>
+        </div>
+        <div class="categoria" data-categoria="deportes">
+            <h2>DEPORTES</h2>
+            <p>¿Eres un experto en competencias?</p>
+        </div>
+        <div class="categoria" data-categoria="entretenimiento">
+            <h2>ENTRETENIMIENTO</h2>
+            <p>¿Sabes de cine, música y series?</p>
+        </div>
+    </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Pantalla de pregunta -->
+    <div class="pregunta-container" id="pregunta">
+        <div class="pregunta-texto" id="pregunta-texto"></div>
+        <div class="opciones-container" id="opciones"></div>
+        <button class="siguiente-btn" id="siguiente">SIGUIENTE PREGUNTA</button>
+    </div>
 
-<script>
-let scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0x000000, 5, 30);
+    <!-- Pantalla final -->
+    <div class="final-container" id="final">
+        <h2>¡JUEGO TERMINADO!</h2>
+        <p>Tu puntaje final es: <span id="puntaje-final">0</span></p>
+        <button class="reiniciar-btn" id="reiniciar">VOLVER A JUGAR</button>
+    </div>
 
-// cámara
-let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-camera.position.y = 1.6;
+    <script>
+        // Base de datos de preguntas
+        const preguntasDB = {
+            ciencia: [
+                {
+                    texto: "¿Cuál es el componente principal del aire que respiramos?",
+                    opciones: ["Oxígeno", "Hidrógeno", "Nitrógeno", "Dióxido de carbono"],
+                    correcta: 2
+                },
+                {
+                    texto: "¿Qué célula es la responsable de la fotosíntesis en las plantas?",
+                    opciones: ["Cloroplasto", "Mitocondria", "Núcleo", "Ribosoma"],
+                    correcta: 0
+                },
+                {
+                    texto: "¿Cuál es el elemento químico con símbolo 'Fe'?",
+                    opciones: ["Plata", "Hierro", "Cobre", "Fósforo"],
+                    correcta: 1
+                }
+            ],
+            historia: [
+                {
+                    texto: "¿En qué año comenzó la Revolución Francesa?",
+                    opciones: ["1789", "1812", "1776", "1848"],
+                    correcta: 0
+                },
+                {
+                    texto: "¿Quién fue el primer emperador romano?",
+                    opciones: ["Julio César", "Augusto", "Nerón", "Constantino"],
+                    correcta: 1
+                },
+                {
+                    texto: "¿Cuándo llegó Cristóbal Colón a América?",
+                    opciones: ["1492", "1500", "1488", "1519"],
+                    correcta: 0
+                }
+            ],
+            deportes: [
+                {
+                    texto: "¿Cuántos jugadores tiene un equipo de fútbol en el campo durante un partido?",
+                    opciones: ["8", "10", "11", "12"],
+                    correcta: 2
+                },
+                {
+                    texto: "¿Quién es considerado el mejor jugador de tenis de la historia?",
+                    opciones: ["Roger Federer", "Rafael Nadal", "Novak Djokovic", "Todos los anteriores son candidatos"],
+                    correcta: 3
+                },
+                {
+                    texto: "¿En qué país se celebraron los primeros Juegos Olímpicos modernos?",
+                    opciones: ["Francia", "Grecia", "Estados Unidos", "Reino Unido"],
+                    correcta: 1
+                }
+            ],
+            entretenimiento: [
+                {
+                    texto: "¿Quién dirigió la película 'Titanic'?",
+                    opciones: ["Steven Spielberg", "James Cameron", "Martin Scorsese", "Quentin Tarantino"],
+                    correcta: 1
+                },
+                {
+                    texto: "¿Cuál es la serie de televisión más vista de Netflix?",
+                    opciones: ["Stranger Things", "La Casa de Papel", "The Crown", "Wednesday"],
+                    correcta: 0
+                },
+                {
+                    texto: "¿Quién es el cantante principal de la banda Queen?",
+                    opciones: ["Freddie Mercury", "Elton John", "David Bowie", "Mick Jagger"],
+                    correcta: 0
+                }
+            ]
+        };
 
-// render
-let renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+        // Elementos del DOM
+        const categoriasContainer = document.getElementById("categorias");
+        const preguntaContainer = document.getElementById("pregunta");
+        const finalContainer = document.getElementById("final");
+        const preguntaTexto = document.getElementById("pregunta-texto");
+        const opcionesContainer = document.getElementById("opciones");
+        const siguienteBtn = document.getElementById("siguiente");
+        const puntajeSpan = document.getElementById("puntaje");
+        const puntajeFinalSpan = document.getElementById("puntaje-final");
+        const reiniciarBtn = document.getElementById("reiniciar");
 
-// luz linterna 🔦
-let flashlight = new THREE.SpotLight(0xffffff, 2, 20, Math.PI/6);
-flashlight.position.set(0,2,0);
-scene.add(flashlight);
+        // Variables globales
+        let categoriaSeleccionada = "";
+        let preguntasDisponibles = [];
+        let preguntaActual = 0;
+        let puntaje = 0;
+        const MAX_PREGUNTAS = 3;
 
-// piso
-let floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(50,50),
-  new THREE.MeshStandardMaterial({color:0x111111})
-);
-floor.rotation.x = -Math.PI/2;
-scene.add(floor);
+        // Evento: Seleccionar categoría
+        categoriasContainer.addEventListener("click", (e) => {
+            const categoria = e.target.closest(".categoria");
+            if (!categoria) return;
+            
+            categoriaSeleccionada = categoria.dataset.categoria;
+            preguntasDisponibles = [...preguntasDB[categoriaSeleccionada]];
+            categoriasContainer.style.display = "none";
+            preguntaContainer.style.display = "block";
+            cargarPregunta();
+        });
 
-// paredes (laberinto)
-function createWall(x,z,w,d){
-  let wall = new THREE.Mesh(
-    new THREE.BoxGeometry(w,3,d),
-    new THREE.MeshStandardMaterial({color:0x222222})
-  );
-  wall.position.set(x,1.5,z);
-  scene.add(wall);
-}
+        // Cargar pregunta actual
+        function cargarPregunta() {
+            if (preguntaActual >= MAX_PREGUNTAS) {
+                mostrarPantallaFinal();
+                return;
+            }
 
-// varias paredes
-createWall(0,-10,20,1);
-createWall(0,10,20,1);
-createWall(-10,0,1,20);
-createWall(10,0,1,20);
-createWall(0,0,1,10);
-createWall(-5,5,10,1);
+            const pregunta = preguntasDisponibles[preguntaActual];
+            preguntaTexto.textContent = pregunta.texto;
+            opcionesContainer.innerHTML = "";
 
-// puerta salida
-let door = new THREE.Mesh(
-  new THREE.BoxGeometry(2,3,0.5),
-  new THREE.MeshStandardMaterial({color:0x00ff00})
-);
-door.position.set(8,1.5,-8);
-scene.add(door);
+            // Crear opciones
+            pregunta.opciones.forEach((opcion, index) => {
+                const div = document.createElement("div");
+                div.className = "opcion";
+                div.textContent = opcion;
+                div.dataset.index = index;
+                div.addEventListener("click", seleccionarOpcion);
+                opcionesContainer.appendChild(div);
+            });
 
-// enemigo 👵 (más grande)
-let enemy = new THREE.Mesh(
-  new THREE.CapsuleGeometry(0.5,1.5),
-  new THREE.MeshStandardMaterial({color:0xff0000})
-);
-enemy.position.set(-5,1,5);
-scene.add(enemy);
+            siguienteBtn.style.display = "none";
+        }
 
-// controles
-let keys = {};
-document.addEventListener("keydown", e=>keys[e.key.toLowerCase()]=true);
-document.addEventListener("keyup", e=>keys[e.key.toLowerCase()]=false);
+        // Seleccionar opción
+        function seleccionarOpcion(e) {
+            const opcionSeleccionada = e.target;
+            const index = parseInt(opcionSeleccionada.dataset.index);
+            const pregunta = preguntasDisponibles[preguntaActual];
 
-// mouse cámara
-document.body.onclick = () => document.body.requestPointerLock();
+            // Bloquear opciones
+            const todasOpciones = document.querySelectorAll(".opcion");
+            todasOpciones.forEach(op => op.removeEventListener("click", seleccionarOpcion));
 
-document.addEventListener("mousemove", e=>{
-  if(document.pointerLockElement){
-    camera.rotation.y -= e.movementX * 0.002;
-  }
-});
+            // Marcar respuesta
+            if (index === pregunta.correcta) {
+                opcionSeleccionada.classList.add("correcta");
+                puntaje += 100;
+                puntajeSpan.textContent = puntaje;
+            } else {
+                opcionSeleccionada.classList.add("incorrecta");
+                todasOpciones[pregunta.correcta].classList.add("correcta");
+            }
 
-// loop
-function animate(){
-  requestAnimationFrame(animate);
+            siguienteBtn.style.display = "block";
+        }
 
-  let speed = 0.08;
+        // Siguiente pregunta
+        siguienteBtn.addEventListener("click", () => {
+            preguntaActual++;
+            cargarPregunta();
+        });
 
-  let dir = new THREE.Vector3();
+        // Mostrar pantalla final
+        function mostrarPantallaFinal() {
+            preguntaContainer.style.display = "none";
+            finalContainer.style.display = "block";
+            puntajeFinalSpan.textContent = puntaje;
+        }
 
-  if(keys["w"]) dir.z -= 1;
-  if(keys["s"]) dir.z += 1;
-  if(keys["a"]) dir.x -= 1;
-  if(keys["d"]) dir.x += 1;
-
-  dir.normalize();
-
-  // mover relativo a cámara
-  camera.position.x += Math.sin(camera.rotation.y) * dir.z * speed;
-  camera.position.z += Math.cos(camera.rotation.y) * dir.z * speed;
-
-  camera.position.x += Math.sin(camera.rotation.y + Math.PI/2) * dir.x * speed;
-  camera.position.z += Math.cos(camera.rotation.y + Math.PI/2) * dir.x * speed;
-
-  // linterna sigue cámara
-  flashlight.position.copy(camera.position);
-  flashlight.target.position.set(
-    camera.position.x + Math.sin(camera.rotation.y),
-    camera.position.y,
-    camera.position.z + Math.cos(camera.rotation.y)
-  );
-  scene.add(flashlight.target);
-
-  // enemigo te sigue 😈
-  enemy.position.x += (camera.position.x - enemy.position.x) * 0.01;
-  enemy.position.z += (camera.position.z - enemy.position.z) * 0.01;
-
-  // distancia
-  let dx = enemy.position.x - camera.position.x;
-  let dz = enemy.position.z - camera.position.z;
-  let dist = Math.sqrt(dx*dx + dz*dz);
-
-  if(dist < 1){
-    alert("💀 Te atrapó la vieja...");
-    location.reload();
-  }
-
-  // ganar
-  if(
-    Math.abs(camera.position.x - door.position.x) < 1 &&
-    Math.abs(camera.position.z - door.position.z) < 1
-  ){
-    alert("🚪 Escapaste!");
-    location.reload();
-  }
-
-  renderer.render(scene, camera);
-}
-
-animate();
-</script>
-
+        // Reiniciar juego
+        reiniciarBtn.addEventListener("click", () => {
+            finalContainer.style.display = "none";
+            categoriasContainer.style.display = "grid";
+            categoriaSeleccionada = "";
+            preguntasDisponibles = [];
+            preguntaActual = 0;
+            puntaje = 0;
+            puntajeSpan.textContent = puntaje;
+        });
+    </script>
 </body>
 </html>
