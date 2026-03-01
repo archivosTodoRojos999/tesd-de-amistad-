@@ -2,121 +2,141 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Casa del Terror</title>
+<title>Casa del Terror PRO</title>
 <style>
-body { margin: 0; overflow: hidden; background: black; }
-#mensaje {
-  position: absolute;
-  top: 20px;
-  width: 100%;
-  text-align: center;
-  color: white;
-  font-size: 20px;
+body { margin:0; overflow:hidden; background:black; }
+#info {
+  position:absolute;
+  top:10px;
+  width:100%;
+  text-align:center;
+  color:white;
+  font-family:Arial;
 }
 </style>
 </head>
 <body>
 
-<div id="mensaje">Encuentra la salida... (WASD para moverte)</div>
+<div id="info">🔦 Encuentra la salida antes que te atrape...</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <script>
 let scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000000);
+scene.fog = new THREE.Fog(0x000000, 5, 30);
 
+// cámara
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+camera.position.y = 1.6;
+
+// render
 let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// luz tenue
-let light = new THREE.PointLight(0xaaaaaa, 0.5);
-light.position.set(0,2,0);
-scene.add(light);
+// luz linterna 🔦
+let flashlight = new THREE.SpotLight(0xffffff, 2, 20, Math.PI/6);
+flashlight.position.set(0,2,0);
+scene.add(flashlight);
 
 // piso
 let floor = new THREE.Mesh(
-  new THREE.BoxGeometry(20,1,20),
-  new THREE.MeshStandardMaterial({color: 0x111111})
+  new THREE.PlaneGeometry(50,50),
+  new THREE.MeshStandardMaterial({color:0x111111})
 );
-floor.position.y = -1;
+floor.rotation.x = -Math.PI/2;
 scene.add(floor);
 
-// paredes (casa)
-function wall(x,z){
-  let w = new THREE.Mesh(
-    new THREE.BoxGeometry(20,5,1),
-    new THREE.MeshStandardMaterial({color: 0x222222})
+// paredes (laberinto)
+function createWall(x,z,w,d){
+  let wall = new THREE.Mesh(
+    new THREE.BoxGeometry(w,3,d),
+    new THREE.MeshStandardMaterial({color:0x222222})
   );
-  w.position.set(x,2,z);
-  scene.add(w);
+  wall.position.set(x,1.5,z);
+  scene.add(wall);
 }
-wall(0,-10);
-wall(0,10);
 
-let sideWall1 = new THREE.Mesh(
-  new THREE.BoxGeometry(1,5,20),
-  new THREE.MeshStandardMaterial({color: 0x222222})
-);
-sideWall1.position.set(-10,2,0);
-scene.add(sideWall1);
-
-let sideWall2 = sideWall1.clone();
-sideWall2.position.x = 10;
-scene.add(sideWall2);
+// varias paredes
+createWall(0,-10,20,1);
+createWall(0,10,20,1);
+createWall(-10,0,1,20);
+createWall(10,0,1,20);
+createWall(0,0,1,10);
+createWall(-5,5,10,1);
 
 // puerta salida
 let door = new THREE.Mesh(
   new THREE.BoxGeometry(2,3,0.5),
-  new THREE.MeshStandardMaterial({color: 0x00ff00})
+  new THREE.MeshStandardMaterial({color:0x00ff00})
 );
-door.position.set(0,1.5,-9);
+door.position.set(8,1.5,-8);
 scene.add(door);
 
-// enemigo (la "vieja")
+// enemigo 👵 (más grande)
 let enemy = new THREE.Mesh(
-  new THREE.SphereGeometry(0.7),
-  new THREE.MeshStandardMaterial({color: 0xff0000})
+  new THREE.CapsuleGeometry(0.5,1.5),
+  new THREE.MeshStandardMaterial({color:0xff0000})
 );
-enemy.position.set(5,1,5);
+enemy.position.set(-5,1,5);
 scene.add(enemy);
-
-camera.position.y = 1.5;
 
 // controles
 let keys = {};
-
-document.addEventListener("keydown", e => keys[e.key.toLowerCase()] = true);
-document.addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
+document.addEventListener("keydown", e=>keys[e.key.toLowerCase()]=true);
+document.addEventListener("keyup", e=>keys[e.key.toLowerCase()]=false);
 
 // mouse cámara
+document.body.onclick = () => document.body.requestPointerLock();
+
 document.addEventListener("mousemove", e=>{
-  camera.rotation.y -= e.movementX * 0.002;
+  if(document.pointerLockElement){
+    camera.rotation.y -= e.movementX * 0.002;
+  }
 });
 
 // loop
 function animate(){
   requestAnimationFrame(animate);
 
-  let speed = 0.1;
+  let speed = 0.08;
 
-  if(keys["w"]) camera.position.z -= speed;
-  if(keys["s"]) camera.position.z += speed;
-  if(keys["a"]) camera.position.x -= speed;
-  if(keys["d"]) camera.position.x += speed;
+  let dir = new THREE.Vector3();
+
+  if(keys["w"]) dir.z -= 1;
+  if(keys["s"]) dir.z += 1;
+  if(keys["a"]) dir.x -= 1;
+  if(keys["d"]) dir.x += 1;
+
+  dir.normalize();
+
+  // mover relativo a cámara
+  camera.position.x += Math.sin(camera.rotation.y) * dir.z * speed;
+  camera.position.z += Math.cos(camera.rotation.y) * dir.z * speed;
+
+  camera.position.x += Math.sin(camera.rotation.y + Math.PI/2) * dir.x * speed;
+  camera.position.z += Math.cos(camera.rotation.y + Math.PI/2) * dir.x * speed;
+
+  // linterna sigue cámara
+  flashlight.position.copy(camera.position);
+  flashlight.target.position.set(
+    camera.position.x + Math.sin(camera.rotation.y),
+    camera.position.y,
+    camera.position.z + Math.cos(camera.rotation.y)
+  );
+  scene.add(flashlight.target);
 
   // enemigo te sigue 😈
   enemy.position.x += (camera.position.x - enemy.position.x) * 0.01;
   enemy.position.z += (camera.position.z - enemy.position.z) * 0.01;
 
-  // perder
+  // distancia
   let dx = enemy.position.x - camera.position.x;
   let dz = enemy.position.z - camera.position.z;
   let dist = Math.sqrt(dx*dx + dz*dz);
 
   if(dist < 1){
-    alert("💀 Te atrapó!");
+    alert("💀 Te atrapó la vieja...");
     location.reload();
   }
 
