@@ -3,377 +3,371 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preguntados - Versión Clon</title>
+    <title>GRANNY - Versión Web</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Courier New', Courier, monospace;
         }
 
         body {
-            background-color: #1a237e;
-            color: white;
-            min-height: 100vh;
+            background-color: #000;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+
+        /* Pantalla de inicio */
+        .pantalla-inicio {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(#1a0a0a, #000);
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            justify-content: center;
+            z-index: 100;
         }
 
-        header {
-            text-align: center;
+        .pantalla-inicio h1 {
+            color: #ff4444;
+            font-size: 3rem;
+            text-shadow: 0 0 20px #ff0000;
+            margin-bottom: 50px;
+            animation: parpadear 2s infinite alternate;
+        }
+
+        .btn-iniciar {
+            padding: 15px 40px;
+            background-color: #ff4444;
+            border: none;
+            color: #000;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px #ff0000;
+        }
+
+        .btn-iniciar:hover {
+            background-color: #ff0000;
+            transform: scale(1.1);
+        }
+
+        /* Mundo del juego */
+        .mundo-juego {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            background-image: url('https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.2);
+        }
+
+        /* Interfaz de usuario */
+        .interfaz {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .btn-movimiento {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid #fff;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-movimiento:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-interaccion {
+            padding: 10px 25px;
+            background-color: rgba(255, 68, 68, 0.7);
+            border: 2px solid #ff4444;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-interaccion:hover {
+            background-color: rgba(255, 0, 0, 0.9);
+        }
+
+        /* Objetos del juego */
+        .objeto {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-size: cover;
+            cursor: pointer;
+            z-index: 10;
+            animation: brillar 2s infinite alternate;
+        }
+
+        .llave {
+            background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+            top: 60%;
+            left: 25%;
+        }
+
+        .martillo {
+            background-image: url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+            top: 45%;
+            left: 70%;
+        }
+
+        .puerta-principal {
+            position: absolute;
+            top: 10%;
+            left: 45%;
+            width: 120px;
+            height: 250px;
+            background-color: rgba(100, 50, 50, 0.8);
+            border: 3px solid #502020;
+            z-index: 5;
+            cursor: pointer;
+        }
+
+        .puerta-abierta {
+            background-color: transparent;
+            border: none;
+            background-image: url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+        }
+
+        /* Granny */
+        .granny {
+            position: absolute;
+            width: 100px;
+            height: 180px;
+            background-image: url('https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            z-index: 15;
+            display: none;
+            animation: caminar 0.5s infinite alternate;
+        }
+
+        /* Mensajes y estado */
+        .estado-juego {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border: 1px solid #ff4444;
+            z-index: 50;
+        }
+
+        .mensaje-alerta {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 0, 0, 0.9);
+            padding: 30px 50px;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px #000;
+            display: none;
+            z-index: 60;
+            animation: temblar 0.2s infinite alternate;
+        }
+
+        .pantalla-fin {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .pantalla-fin h2 {
+            color: #ff4444;
+            font-size: 2.5rem;
             margin-bottom: 30px;
         }
 
-        h1 {
-            color: #ffd600;
-            font-size: 2.5rem;
+        /* Animaciones */
+        @keyframes parpadear {
+            from { opacity: 1; }
+            to { opacity: 0.5; }
         }
 
-        .puntaje {
-            font-size: 1.5rem;
-            margin-top: 10px;
-            background-color: #0d47a1;
-            padding: 10px 20px;
-            border-radius: 10px;
+        @keyframes brillar {
+            from { filter: brightness(0.8); }
+            to { filter: brightness(1.5); }
         }
 
-        /* Pantalla de categorías */
-        .categorias-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            max-width: 600px;
-            width: 100%;
+        @keyframes caminar {
+            from { transform: translateY(0); }
+            to { transform: translateY(5px); }
         }
 
-        .categoria {
-            background-color: #283593;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s, background-color 0.2s;
-            border: 2px solid #ffd600;
+        @keyframes temblar {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(2deg); }
         }
 
-        .categoria:hover {
-            transform: scale(1.05);
-            background-color: #3949ab;
-        }
-
-        .categoria h2 {
-            color: #ffd600;
-            margin-bottom: 10px;
-        }
-
-        /* Pantalla de pregunta */
-        .pregunta-container {
-            max-width: 600px;
-            width: 100%;
-            background-color: #283593;
-            border-radius: 15px;
-            padding: 30px;
-            display: none;
-        }
-
-        .pregunta-texto {
-            font-size: 1.2rem;
-            margin-bottom: 25px;
-            text-align: center;
-            min-height: 60px;
-        }
-
-        .opciones-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .opcion {
-            background-color: #0d47a1;
-            padding: 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            text-align: center;
-        }
-
-        .opcion:hover {
-            background-color: #1976d2;
-        }
-
-        .opcion.correcta {
-            background-color: #2e7d32;
-        }
-
-        .opcion.incorrecta {
-            background-color: #c62828;
-        }
-
-        /* Botón de siguiente */
-        .siguiente-btn {
-            background-color: #ffd600;
-            color: #1a237e;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 25px;
-            display: none;
-        }
-
-        .siguiente-btn:hover {
-            background-color: #ffee58;
-        }
-
-        /* Pantalla final */
-        .final-container {
-            max-width: 600px;
-            width: 100%;
-            background-color: #283593;
-            border-radius: 15px;
-            padding: 40px;
-            text-align: center;
-            display: none;
-        }
-
-        .final-container h2 {
-            color: #ffd600;
-            margin-bottom: 20px;
-            font-size: 2rem;
-        }
-
-        .reiniciar-btn {
-            background-color: #ffd600;
-            color: #1a237e;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 25px;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .pantalla-inicio h1 { font-size: 2rem; }
+            .btn-movimiento { width: 50px; height: 50px; }
+            .estado-juego { font-size: 0.8rem; padding: 10px; }
+            .mensaje-alerta { font-size: 1.2rem; padding: 20px 30px; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>PREGUNTADOS</h1>
-        <div class="puntaje">Puntaje: <span id="puntaje">0</span></div>
-    </header>
-
-    <!-- Pantalla de categorías -->
-    <div class="categorias-container" id="categorias">
-        <div class="categoria" data-categoria="ciencia">
-            <h2>CIENCIA</h2>
-            <p>¿Sabes de física, química y biología?</p>
-        </div>
-        <div class="categoria" data-categoria="historia">
-            <h2>HISTORIA</h2>
-            <p>¿Conoces los hechos clave del pasado?</p>
-        </div>
-        <div class="categoria" data-categoria="deportes">
-            <h2>DEPORTES</h2>
-            <p>¿Eres un experto en competencias?</p>
-        </div>
-        <div class="categoria" data-categoria="entretenimiento">
-            <h2>ENTRETENIMIENTO</h2>
-            <p>¿Sabes de cine, música y series?</p>
-        </div>
+    <!-- Pantalla de inicio -->
+    <div class="pantalla-inicio" id="pantalla-inicio">
+        <h1>GRANNY</h1>
+        <button class="btn-iniciar" id="btn-iniciar">INICIAR JUEGO</button>
+        <p style="margin-top: 30px; font-size: 0.9rem;">Objetivo: Encuentra la llave y el martillo para escapar antes de que Granny te atrape</p>
     </div>
 
-    <!-- Pantalla de pregunta -->
-    <div class="pregunta-container" id="pregunta">
-        <div class="pregunta-texto" id="pregunta-texto"></div>
-        <div class="opciones-container" id="opciones"></div>
-        <button class="siguiente-btn" id="siguiente">SIGUIENTE PREGUNTA</button>
+    <!-- Mundo del juego -->
+    <div class="mundo-juego" id="mundo-juego"></div>
+
+    <!-- Objetos -->
+    <div class="objeto llave" id="llave" title="Llave de la puerta"></div>
+    <div class="objeto martillo" id="martillo" title="Martillo para abrir la puerta"></div>
+
+    <!-- Puerta principal -->
+    <div class="puerta-principal" id="puerta-principal" title="Puerta de salida"></div>
+
+    <!-- Granny -->
+    <div class="granny" id="granny"></div>
+
+    <!-- Interfaz de usuario -->
+    <div class="interfaz">
+        <button class="btn-movimiento" id="btn-izq">&larr;</button>
+        <button class="btn-movimiento" id="btn-der">&rarr;</button>
+        <button class="btn-movimiento" id="btn-arr">&uarr;</button>
+        <button class="btn-movimiento" id="btn-aba">&darr;</button>
+        <button class="btn-interaccion" id="btn-interactuar">COGER / USAR</button>
     </div>
 
-    <!-- Pantalla final -->
-    <div class="final-container" id="final">
-        <h2>¡JUEGO TERMINADO!</h2>
-        <p>Tu puntaje final es: <span id="puntaje-final">0</span></p>
-        <button class="reiniciar-btn" id="reiniciar">VOLVER A JUGAR</button>
+    <!-- Estado del juego -->
+    <div class="estado-juego">
+        <p>Día: <span id="dia">1</span>/5</p>
+        <p>Objetos: <span id="objetos">Ninguno</span></p>
+        <p>Estado: <span id="estado">Seguro</span></p>
     </div>
+
+    <!-- Mensajes de alerta -->
+    <div class="mensaje-alerta" id="mensaje-alerta">¡GRANNY TE HA VISTO!</div>
+
+    <!-- Pantalla de fin -->
+    <div class="pantalla-fin" id="pantalla-fin">
+        <h2 id="texto-fin"></h2>
+        <button class="btn-iniciar" id="btn-reiniciar">JUGAR DE NUEVO</button>
+    </div>
+
+    <!-- Sonidos -->
+    <audio id="sonido-pasos" src="https://www.soundjay.com/footstep/sounds/footstep-wood-03.mp3" loop>
+    <audio id="sonido-gemido" src="https://www.soundjay.com/human/sounds/scream-05.mp3">
+    <audio id="sonido-objeto" src="https://www.soundjay.com/button/sounds/button-09.mp3">
+    <audio id="sonido-puerta" src="https://www.soundjay.com/door/sounds/door-creak-01.mp3">
+    <audio id="sonido-escapa" src="https://www.soundjay.com/misc/sounds/success-01.mp3">
+    <audio id="sonido-gameover" src="https://www.soundjay.com/misc/sounds/failure-01.mp3">
 
     <script>
-        // Base de datos de preguntas
-        const preguntasDB = {
-            ciencia: [
-                {
-                    texto: "¿Cuál es el componente principal del aire que respiramos?",
-                    opciones: ["Oxígeno", "Hidrógeno", "Nitrógeno", "Dióxido de carbono"],
-                    correcta: 2
-                },
-                {
-                    texto: "¿Qué célula es la responsable de la fotosíntesis en las plantas?",
-                    opciones: ["Cloroplasto", "Mitocondria", "Núcleo", "Ribosoma"],
-                    correcta: 0
-                },
-                {
-                    texto: "¿Cuál es el elemento químico con símbolo 'Fe'?",
-                    opciones: ["Plata", "Hierro", "Cobre", "Fósforo"],
-                    correcta: 1
-                }
-            ],
-            historia: [
-                {
-                    texto: "¿En qué año comenzó la Revolución Francesa?",
-                    opciones: ["1789", "1812", "1776", "1848"],
-                    correcta: 0
-                },
-                {
-                    texto: "¿Quién fue el primer emperador romano?",
-                    opciones: ["Julio César", "Augusto", "Nerón", "Constantino"],
-                    correcta: 1
-                },
-                {
-                    texto: "¿Cuándo llegó Cristóbal Colón a América?",
-                    opciones: ["1492", "1500", "1488", "1519"],
-                    correcta: 0
-                }
-            ],
-            deportes: [
-                {
-                    texto: "¿Cuántos jugadores tiene un equipo de fútbol en el campo durante un partido?",
-                    opciones: ["8", "10", "11", "12"],
-                    correcta: 2
-                },
-                {
-                    texto: "¿Quién es considerado el mejor jugador de tenis de la historia?",
-                    opciones: ["Roger Federer", "Rafael Nadal", "Novak Djokovic", "Todos los anteriores son candidatos"],
-                    correcta: 3
-                },
-                {
-                    texto: "¿En qué país se celebraron los primeros Juegos Olímpicos modernos?",
-                    opciones: ["Francia", "Grecia", "Estados Unidos", "Reino Unido"],
-                    correcta: 1
-                }
-            ],
-            entretenimiento: [
-                {
-                    texto: "¿Quién dirigió la película 'Titanic'?",
-                    opciones: ["Steven Spielberg", "James Cameron", "Martin Scorsese", "Quentin Tarantino"],
-                    correcta: 1
-                },
-                {
-                    texto: "¿Cuál es la serie de televisión más vista de Netflix?",
-                    opciones: ["Stranger Things", "La Casa de Papel", "The Crown", "Wednesday"],
-                    correcta: 0
-                },
-                {
-                    texto: "¿Quién es el cantante principal de la banda Queen?",
-                    opciones: ["Freddie Mercury", "Elton John", "David Bowie", "Mick Jagger"],
-                    correcta: 0
-                }
-            ]
+        // Elementos del DOM
+        const pantallaInicio = document.getElementById("pantalla-inicio");
+        const mundoJuego = document.getElementById("mundo-juego");
+        const granny = document.getElementById("granny");
+        const llave = document.getElementById("llave");
+        const martillo = document.getElementById("martillo");
+        const puertaPrincipal = document.getElementById("puerta-principal");
+        const mensajeAlerta = document.getElementById("mensaje-alerta");
+        const pantallaFin = document.getElementById("pantalla-fin");
+        const textoFin = document.getElementById("texto-fin");
+
+        // Botones
+        const btnIniciar = document.getElementById("btn-iniciar");
+        const btnReiniciar = document.getElementById("btn-reiniciar");
+        const btnInteractuar = document.getElementById("btn-interactuar");
+        const btnIzq = document.getElementById("btn-izq");
+        const btnDer = document.getElementById("btn-der");
+        const btnArr = document.getElementById("btn-arr");
+        const btnAba = document.getElementById("btn-aba");
+
+        // Estado del juego
+        const estadoJuego = {
+            dia: 1,
+            objetos: [],
+            posicionJugador: { x: 50, y: 50 },
+            grannyActiva: false,
+            juegoTerminado: false
         };
 
-        // Elementos del DOM
-        const categoriasContainer = document.getElementById("categorias");
-        const preguntaContainer = document.getElementById("pregunta");
-        const finalContainer = document.getElementById("final");
-        const preguntaTexto = document.getElementById("pregunta-texto");
-        const opcionesContainer = document.getElementById("opciones");
-        const siguienteBtn = document.getElementById("siguiente");
-        const puntajeSpan = document.getElementById("puntaje");
-        const puntajeFinalSpan = document.getElementById("puntaje-final");
-        const reiniciarBtn = document.getElementById("reiniciar");
+        // Sonidos
+        const sonidoPasos = document.getElementById("sonido-pasos");
+        const sonidoGemido = document.getElementById("sonido-gemido");
+        const sonidoObjeto = document.getElementById("sonido-objeto");
+        const sonidoPuerta = document.getElementById("sonido-puerta");
+        const sonidoEscapa = document.getElementById("sonido-escapa");
+        const sonidoGameOver = document.getElementById("sonido-gameover");
 
-        // Variables globales
-        let categoriaSeleccionada = "";
-        let preguntasDisponibles = [];
-        let preguntaActual = 0;
-        let puntaje = 0;
-        const MAX_PREGUNTAS = 3;
+        // Actualizar interfaz
+        function actualizarInterfaz() {
+            document.getElementById("dia").textContent = estadoJuego.dia;
+            document.getElementById("objetos").textContent = estadoJuego.objetos.length > 0 ? estadoJuego.objetos.join(", ") : "Ninguno";
+            document.getElementById("estado").textContent = estadoJuego.grannyActiva ? "Peligro" : "Seguro";
+        }
 
-        // Evento: Seleccionar categoría
-        categoriasContainer.addEventListener("click", (e) => {
-            const categoria = e.target.closest(".categoria");
-            if (!categoria) return;
-            
-            categoriaSeleccionada = categoria.dataset.categoria;
-            preguntasDisponibles = [...preguntasDB[categoriaSeleccionada]];
-            categoriasContainer.style.display = "none";
-            preguntaContainer.style.display = "block";
-            cargarPregunta();
-        });
+        // Movimiento de Granny
+        function moverGranny() {
+            if (!estadoJuego.grannyActiva || estadoJuego.juegoTerminado) return;
 
-        // Cargar pregunta actual
-        function cargarPregunta() {
-            if (preguntaActual >= MAX_PREGUNTAS) {
-                mostrarPantallaFinal();
-                return;
+            const posJugadorX = estadoJuego.posicionJugador.x;
+            const posJugadorY = estadoJuego.posicionJugador.y;
+            let posGrannyX = parseInt(granny.style.left) || 10;
+            let posGrannyY = parseInt(granny.style.top) || 10;
+
+            // Movimiento hacia el jugador
+            if (posGrannyX < posJugadorX) posGrannyX += 0.5;
+            else if (posGrannyX > posJugadorX) posGrannyX -= 0.5;
+
+            if (posGrannyY < posJugadorY) posGrannyY += 0.5;
+            else if (posGrannyY > posJugadorY) posGrannyY -= 0.5;
+
+            granny.style.left = `${posGrannyX}%`;
+            granny.style.top = `${posGrannyY}%`;
+
+            // Comprobar si te atrapa
+            if (Math.abs(posGrannyX - posJugadorX) < 5 && Math.abs(posGrannyY - posJugadorY) < 5) {
+                gameOver("GRANNY TE HA ATRAPADO...");
             }
 
-            const pregunta = preguntasDisponibles[preguntaActual];
-            preguntaTexto.textContent = pregunta.texto;
-            opcionesContainer.innerHTML = "";
-
-            // Crear opciones
-            pregunta.opciones.forEach((opcion, index) => {
-                const div = document.createElement("div");
-                div.className = "opcion";
-                div.textContent = opcion;
-                div.dataset.index = index;
-                div.addEventListener("click", seleccionarOpcion);
-                opcionesContainer.appendChild(div);
-            });
-
-            siguienteBtn.style.display = "none";
-        }
-
-        // Seleccionar opción
-        function seleccionarOpcion(e) {
-            const opcionSeleccionada = e.target;
-            const index = parseInt(opcionSeleccionada.dataset.index);
-            const pregunta = preguntasDisponibles[preguntaActual];
-
-            // Bloquear opciones
-            const todasOpciones = document.querySelectorAll(".opcion");
-            todasOpciones.forEach(op => op.removeEventListener("click", seleccionarOpcion));
-
-            // Marcar respuesta
-            if (index === pregunta.correcta) {
-                opcionSeleccionada.classList.add("correcta");
-                puntaje += 100;
-                puntajeSpan.textContent = puntaje;
-            } else {
-                opcionSeleccionada.classList.add("incorrecta");
-                todasOpciones[pregunta.correcta].classList.add("correcta");
-            }
-
-            siguienteBtn.style.display = "block";
-        }
-
-        // Siguiente pregunta
-        siguienteBtn.addEventListener("click", () => {
-            preguntaActual++;
-            cargarPregunta();
-        });
-
-        // Mostrar pantalla final
-        function mostrarPantallaFinal() {
-            preguntaContainer.style.display = "none";
-            finalContainer.style.display = "block";
-            puntajeFinalSpan.textContent = puntaje;
-        }
-
-        // Reiniciar juego
-        reiniciarBtn.addEventListener("click", () => {
-            finalContainer.style.display = "none";
-            categoriasContainer.style.display = "grid";
-            categoriaSeleccionada = "";
-            preguntasDisponibles = [];
-            preguntaActual = 0;
-            puntaje = 0;
-            puntajeSpan.textContent = puntaje;
-        });
-    </script>
-</body>
-</html>
+            setTimeout(m
