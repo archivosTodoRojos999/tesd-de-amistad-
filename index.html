@@ -1,296 +1,135 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GRANNY - Juego Funcional</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Courier New', Courier, monospace;
-        }
-
-        body {
-            background-color: #000;
-            color: #fff;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            position: relative;
-        }
-
-        /* PANTALLA INICIO */
-        .inicio {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(#1a0a0a, #000);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            text-align: center;
-        }
-
-        .inicio h1 {
-            color: #ff4444;
-            font-size: 3rem;
-            text-shadow: 0 0 20px #ff0000;
-            margin-bottom: 30px;
-            animation: parpadear 2s infinite alternate;
-        }
-
-        .inicio p {
-            margin-bottom: 40px;
-            font-size: 1.1rem;
-            max-width: 80%;
-        }
-
-        .btn {
-            padding: 15px 40px;
-            background-color: #ff4444;
-            border: none;
-            color: #000;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0 0 15px #ff0000;
-        }
-
-        .btn:hover {
-            background-color: #ff0000;
-            transform: scale(1.05);
-        }
-
-        .juego {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://picsum.photos/id/164/1920/1080');
-            background-size: cover;
-            filter: brightness(0.2);
-            display: none;
-        }
-
-        .jugador {
-            position: absolute;
-            width: 30px;
-            height: 50px;
-            background-color: rgba(255, 255, 255, 0.7);
-        }
-
-        .objeto {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            background-size: cover;
-        }
-
-        .llave { top: 60%; left: 25%; }
-        .martillo { top: 45%; left: 70%; }
-
-        .puerta {
-            position: absolute;
-            top: 10%;
-            left: 45%;
-            width: 120px;
-            height: 250px;
-            background: brown;
-        }
-
-        .puerta.abierta { background: green; }
-
-        .granny {
-            position: absolute;
-            width: 100px;
-            height: 180px;
-            background: red;
-            display: none;
-        }
-
-        .estado {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-        }
-
-        .interfaz {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .btn-mov, .btn-interactuar {
-            margin: 5px;
-            padding: 10px;
-        }
-
-        .alerta {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: none;
-        }
-
-        .fin {
-            display: none;
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: black;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        /* 📱 MODO CELULAR */
-        @media (max-width: 768px) {
-
-            .inicio h1 { font-size: 2rem; }
-            .inicio p { font-size: 0.9rem; }
-
-            .btn { padding: 12px 25px; font-size: 1rem; }
-
-            .jugador { width: 25px; height: 40px; }
-            .objeto { width: 30px; height: 30px; }
-            .puerta { width: 90px; height: 200px; }
-            .granny { width: 70px; height: 140px; }
-
-            .btn-mov {
-                width: 60px;
-                height: 60px;
-                font-size: 1.5rem;
-            }
-
-            .estado {
-                font-size: 0.8rem;
-            }
-        }
-
-        @keyframes parpadear { from {opacity:1;} to {opacity:0.5;} }
-    </style>
-</head>
-<body>
-
-<div class="inicio" id="inicio">
-    <h1>GRANNY</h1>
-    <button class="btn" id="btn-iniciar">EMPEZAR</button>
-</div>
-
-<div class="juego" id="juego">
-    <div class="jugador" id="jugador"></div>
-    <div class="objeto llave" id="llave"></div>
-    <div class="objeto martillo" id="martillo"></div>
-    <div class="puerta" id="puerta"></div>
-    <div class="granny" id="granny"></div>
-</div>
-
-<div class="estado">
-    Objetos: <span id="objetos">Ninguno</span>
-</div>
-
-<div class="interfaz">
-    <button id="arriba">↑</button>
-    <button id="abajo">↓</button>
-    <button id="izquierda">←</button>
-    <button id="derecha">→</button>
-    <button id="interactuar">USAR</button>
-</div>
-
-<div class="alerta" id="alerta"></div>
-
-<div class="fin" id="fin">
-    <h2 id="texto-fin"></h2>
-    <button id="btn-reiniciar">REINICIAR</button>
-</div>
-
 <script>
-let jugadorPos = { x: 50, y: 50 };
-let objetos = [];
-let juegoActivo = false;
-let grannyActiva = false;
+    let juegoActivo = false;
+    let enAuto = false;
+    let enCasa = false;
 
-const jugador = document.getElementById('jugador');
-const llave = document.getElementById('llave');
-const martillo = document.getElementById('martillo');
-const puerta = document.getElementById('puerta');
-const granny = document.getElementById('granny');
+    let camaraPos = { x: 50, y: 50 };
+    let autoSeleccionado = 0;
 
-function actualizarJugador() {
-    jugador.style.left = jugadorPos.x + "%";
-    jugador.style.top = jugadorPos.y + "%";
-}
+    const autos = document.querySelectorAll('.auto');
+    const autoPos = [30, 50, 70];
 
-function mover(dir) {
-    if (!juegoActivo) return;
+    const camaraPeaton = document.getElementById('camara-peaton');
+    const camaraAuto = document.getElementById('camara-auto');
+    const camaraInterior = document.getElementById('camara-interior');
 
-    if (dir === 'arriba') jugadorPos.y -= 2;
-    if (dir === 'abajo') jugadorPos.y += 2;
-    if (dir === 'izquierda') jugadorPos.x -= 2;
-    if (dir === 'derecha') jugadorPos.x += 2;
+    const inicio = document.getElementById('pantalla-inicio');
+    const juego = document.getElementById('pantalla-juego');
 
-    actualizarJugador();
-}
+    let ubicacion = "San Fierro - Zona Sur";
 
-function moverGranny() {
-    let gx = parseFloat(granny.style.left) || 10;
-    let gy = parseFloat(granny.style.top) || 10;
+    function actualizarCamara() {
+        camaraPeaton.style.backgroundPosition = `${camaraPos.x}% ${camaraPos.y}%`;
+    }
 
-    if (gx < jugadorPos.x) gx += 0.5;
-    if (gx > jugadorPos.x) gx -= 0.5;
-    if (gy < jugadorPos.y) gy += 0.5;
-    if (gy > jugadorPos.y) gy -= 0.5;
+    function moverCamara(dx, dy) {
+        camaraPos.x += dx;
+        camaraPos.y += dy;
 
-    granny.style.left = gx + "%";
-    granny.style.top = gy + "%";
+        camaraPos.x = Math.max(0, Math.min(100, camaraPos.x));
+        camaraPos.y = Math.max(0, Math.min(100, camaraPos.y));
 
-    setTimeout(moverGranny, 50);
-}
+        actualizarCamara();
+    }
 
-document.getElementById('btn-iniciar').onclick = () => {
-    document.getElementById('inicio').style.display = 'none';
-    document.getElementById('juego').style.display = 'block';
-    juegoActivo = true;
+    function moverPersonaje(dx, dy) {
+        if (!juegoActivo || enAuto) return;
+        moverCamara(dx, dy);
+    }
 
-    granny.style.display = 'block';
-    moverGranny();
-};
+    function toggleAuto() {
+        enAuto = !enAuto;
+        enCasa = false;
 
-document.getElementById('arriba').onclick = () => mover('arriba');
-document.getElementById('abajo').onclick = () => mover('abajo');
-document.getElementById('izquierda').onclick = () => mover('izquierda');
-document.getElementById('derecha').onclick = () => mover('derecha');
+        camaraPeaton.style.display = enAuto ? "none" : "block";
+        camaraAuto.style.display = enAuto ? "block" : "none";
+        camaraInterior.style.display = "none";
 
-/* 📱 CONTROLES TÁCTILES */
-let intervaloMovimiento = null;
+        document.getElementById('sonido-puerta-sa').play();
+        document.getElementById('sonido-motor-sa')[enAuto ? "play" : "pause"]();
 
-function iniciarMovimiento(dir) {
-    intervaloMovimiento = setInterval(() => mover(dir), 50);
-}
+        actualizarCamara();
+    }
 
-function detenerMovimiento() {
-    clearInterval(intervaloMovimiento);
-}
+    function moverAuto() {
+        if (!enAuto) return;
 
-arriba.addEventListener('touchstart', () => iniciarMovimiento('arriba'));
-abajo.addEventListener('touchstart', () => iniciarMovimiento('abajo'));
-izquierda.addEventListener('touchstart', () => iniciarMovimiento('izquierda'));
-derecha.addEventListener('touchstart', () => iniciarMovimiento('derecha'));
+        autoPos[autoSeleccionado] += 2;
+        autos[autoSeleccionado].style.left = autoPos[autoSeleccionado] + "%";
+    }
 
-arriba.addEventListener('touchend', detenerMovimiento);
-abajo.addEventListener('touchend', detenerMovimiento);
-izquierda.addEventListener('touchend', detenerMovimiento);
-derecha.addEventListener('touchend', detenerMovimiento);
+    function toggleCasa() {
+        enCasa = !enCasa;
+        enAuto = false;
 
+        if (enCasa) {
+            ubicacion = "Interior de casa";
+            camaraPeaton.style.display = "none";
+            camaraAuto.style.display = "none";
+            camaraInterior.style.display = "block";
+        } else {
+            ubicacion = "San Fierro - Zona Sur";
+            camaraPeaton.style.display = "block";
+            camaraInterior.style.display = "none";
+        }
+
+        document.getElementById('ubicacion').textContent = ubicacion;
+        document.getElementById('sonido-puerta-sa').play();
+    }
+
+    document.getElementById('btn-iniciar').onclick = () => {
+        inicio.style.display = "none";
+        juego.style.display = "block";
+        juegoActivo = true;
+
+        document.getElementById('sonido-calle').play();
+        actualizarCamara();
+    };
+
+    document.getElementById('btn-cam-izq').onclick = () => moverCamara(-3, 0);
+    document.getElementById('btn-cam-der').onclick = () => moverCamara(3, 0);
+
+    document.getElementById('btn-entrar-auto').onclick = toggleAuto;
+    document.getElementById('btn-bajar-auto').onclick = toggleAuto;
+    document.getElementById('btn-mover-auto').onclick = moverAuto;
+    document.getElementById('btn-entrar-casa').onclick = toggleCasa;
+
+    document.addEventListener("keydown", (e) => {
+        if (!juegoActivo) return;
+
+        switch(e.key.toLowerCase()) {
+            case "arrowleft":
+            case "a":
+                moverPersonaje(-2, 0);
+                break;
+            case "arrowright":
+            case "d":
+                moverPersonaje(2, 0);
+                break;
+            case "arrowup":
+            case "w":
+                moverPersonaje(0, 2);
+                break;
+            case "arrowdown":
+            case "s":
+                moverPersonaje(0, -2);
+                break;
+            case "e":
+                toggleAuto();
+                break;
+            case "c":
+                toggleCasa();
+                break;
+            case "m":
+                autoSeleccionado = (autoSeleccionado + 1) % autos.length;
+                document.getElementById('auto-actual').textContent =
+                    ['Fiat Uno', 'VW Saveiro', 'Chevrolet Corsa'][autoSeleccionado];
+                break;
+            case "f":
+                document.getElementById('sonido-pistola').play();
+                break;
+        }
+    });
 </script>
-
 </body>
 </html>
