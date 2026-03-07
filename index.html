@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Configuración de Sensibilidad</title>
+    <meta charset="UTF-8" />
+    <title>Calibrador de Sensibilidad</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -58,53 +58,40 @@
 </head>
 <body>
     <div class="container">
-        <h2>Configuración de Sensibilidad de tu Celular</h2>
-        <form id="sensibilidadForm">
+        <h2>Calibrador de Sensibilidad</h2>
+        <form id="calibrarForm">
             <label for="marca">Marca:</label>
-            <input type="text" id="marca" name="marca" placeholder="Ejemplo: Samsung">
+            <input type="text" id="marca" placeholder="Ejemplo: Samsung" required />
 
             <label for="modelo">Modelo:</label>
-            <input type="text" id="modelo" name="modelo" placeholder="Ejemplo: Galaxy S21">
+            <input type="text" id="modelo" placeholder="Ejemplo: Galaxy S21" required />
 
-            <label for="sensibilidad_general">Sensibilidad General:</label>
-            <input type="text" id="sensibilidad_general" name="sensibilidad_general" placeholder="Valor">
-
-            <label for="sensibilidad_rojo">Sensibilidad de Punto Rojo:</label>
-            <input type="text" id="sensibilidad_rojo" name="sensibilidad_rojo" placeholder="Valor">
-
-            <label for="sensibilidad_mira_x2">Sensibilidad Mira X2:</label>
-            <input type="text" id="sensibilidad_mira_x2" name="sensibilidad_mira_x2" placeholder="Valor">
-
-            <label for="sensibilidad_mira_x4">Sensibilidad Mira X4:</label>
-            <input type="text" id="sensibilidad_mira_x4" name="sensibilidad_mira_x4" placeholder="Valor">
-
-            <label for="tamaño_boton">Tamaño del Botón:</label>
-            <input type="text" id="tamaño_boton" name="tamaño_boton" placeholder="Valor">
-
-            <label for="precisión">Precisión:</label>
-            <input type="text" id="precisión" name="precisión" placeholder="Valor">
-
-            <button type="button" onclick="mostrarResultado()">Generar Sensibilidad</button>
+            <button type="button" onclick="calibrarSensibilidad()">Generar Sensibilidad</button>
         </form>
         <div class="resultado" id="resultado"></div>
     </div>
 
     <script>
-        function mostrarResultado() {
+        function calibrarSensibilidad() {
             const marca = document.getElementById('marca').value;
             const modelo = document.getElementById('modelo').value;
-            const sensibilidadGeneral = document.getElementById('sensibilidad_general').value;
-            const sensibilidadRojo = document.getElementById('sensibilidad_rojo').value;
-            const sensibilidadMiraX2 = document.getElementById('sensibilidad_mira_x2').value;
-            const sensibilidadMiraX4 = document.getElementById('sensibilidad_mira_x4').value;
-            const tamañoBoton = document.getElementById('tamaño_boton').value;
-            const precision = document.getElementById('precisión').value;
+
+            // Aquí puedes agregar la lógica para calcular la sensibilidad.
+            // Como ejemplo, usaremos valores ficticios o una fórmula simple.
+
+            // Ejemplo: Sensibilidad basada en la longitud del nombre de la marca y modelo
+            const sensibilidadGeneral = Math.min(200, marca.length * 10 + modelo.length * 5);
+            const sensibilidadPuntoRojo = sensibilidadGeneral - 10;
+            const sensibilidadMiraX2 = sensibilidadGeneral - 20;
+            const sensibilidadMiraX4 = sensibilidadGeneral - 30;
+            const tamañoBoton = Math.max(10, sensibilidadGeneral / 10);
+            const precision = 100 - sensibilidadGeneral;
 
             const resultadoDiv = document.getElementById('resultado');
             resultadoDiv.innerHTML = `
                 <h3>Configuración para ${marca} ${modelo}</h3>
                 <p>Sensibilidad General: ${sensibilidadGeneral}</p>
-                <p>Sensibilidad de Punto Rojo: ${sensibilidadRojo}</p>
+                <p>Sensibilidad de Punto Rojo: ${sensibilidadPuntoRojo}</p>
                 <p>Sensibilidad Mira X2: ${sensibilidadMiraX2}</p>
                 <p>Sensibilidad Mira X4: ${sensibilidadMiraX4}</p>
                 <p>Tamaño del Botón: ${tamañoBoton}</p>
