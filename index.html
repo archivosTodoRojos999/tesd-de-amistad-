@@ -2,235 +2,179 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Generador de Sensibilidad Pro</title>
+<title>Juego de Autos</title>
 
 <style>
-
 body{
-background:black;
-color:#00ff88;
-font-family:monospace;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
+margin:0;
+background:#111;
 overflow:hidden;
-}
-
-/* CANVAS DE FONDO */
-#bg{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-z-index:-1;
-}
-
-.panel{
-width:450px;
-border:2px solid #00ff88;
-padding:25px;
-box-shadow:0 0 25px #00ff88;
-background:rgba(0,0,0,0.7);
-backdrop-filter:blur(4px);
-}
-
-h2{
+font-family:monospace;
+color:white;
 text-align:center;
 }
 
-select,button{
-width:100%;
-margin-top:10px;
-padding:10px;
-background:black;
-color:#00ff88;
-border:1px solid #00ff88;
-font-family:monospace;
+canvas{
+background:#333;
+display:block;
+margin:auto;
 }
-
-.result{
-margin-top:20px;
-line-height:1.7;
-}
-
 </style>
-
 </head>
 
 <body>
 
-<canvas id="bg"></canvas>
+<h2>🚗 Esquiva los autos</h2>
+<p>⬅️➡️ mover | ⬆️ acelerar</p>
 
-<div class="panel">
+<canvas id="game" width="400" height="600"></canvas>
 
-<h2>⚡ GENERADOR DE SENSIBILIDAD</h2>
-
-<label>Dispositivo</label>
-<select id="device">
-
-<option>Samsung</option>
-<option>Xiaomi</option>
-<option>Redmi</option>
-<option>Poco</option>
-<option>Huawei</option>
-<option>Honor</option>
-<option>Motorola</option>
-<option>Realme</option>
-<option>Oppo</option>
-<option>Vivo</option>
-<option>OnePlus</option>
-<option>Asus</option>
-<option>ROG Phone</option>
-<option>Black Shark</option>
-<option>Lenovo</option>
-<option>Nokia</option>
-<option>Sony</option>
-<option>LG</option>
-<option>ZTE</option>
-<option>Google Pixel</option>
-<option>iPhone</option>
-<option>iPad</option>
-<option>PC Gamer</option>
-<option>Laptop</option>
-<option>Tablet Android</option>
-
-</select>
-
-<button onclick="generar()">GENERAR SENSIBILIDAD</button>
-
-<div class="result" id="resultado"></div>
-
-</div>
+<!-- sonido de motor -->
+<audio id="engine" loop>
+<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3c2f8b08a3.mp3">
+</audio>
 
 <script>
 
-/* FONDO ANIMADO */
+const canvas = document.getElementById("game")
+const ctx = canvas.getContext("2d")
+const engine = document.getElementById("engine")
 
-const canvas=document.getElementById("bg")
-const ctx=canvas.getContext("2d")
-
-canvas.width=window.innerWidth
-canvas.height=window.innerHeight
-
-let particles=[]
-
-for(let i=0;i<120;i++){
-particles.push({
-x:Math.random()*canvas.width,
-y:Math.random()*canvas.height,
-vx:(Math.random()-0.5)*0.7,
-vy:(Math.random()-0.5)*0.7,
-size:Math.random()*2+1
-})
+let player = {
+x:180,
+y:500,
+w:40,
+h:80,
+speed:6
 }
 
-function animateBg(){
+let cars = []
+let score = 0
+let gameSpeed = 4
+
+let keys = {}
+
+document.addEventListener("keydown",e=>keys[e.key]=true)
+document.addEventListener("keyup",e=>keys[e.key]=false)
+
+function spawnCar(){
+
+let lane = Math.floor(Math.random()*3)
+let x = 80 + lane*120
+
+cars.push({
+x:x,
+y:-100,
+w:40,
+h:80,
+speed:gameSpeed
+})
+
+}
+
+setInterval(spawnCar,1000)
+
+function update(){
+
+if(keys["ArrowLeft"]) player.x -= player.speed
+if(keys["ArrowRight"]) player.x += player.speed
+
+// acelerar
+if(keys["ArrowUp"]){
+
+gameSpeed += 0.02
+
+engine.play().catch(()=>{})
+
+}else{
+
+engine.pause()
+
+}
+
+if(player.x<40) player.x=40
+if(player.x>320) player.x=320
+
+cars.forEach(car=>{
+
+car.y += car.speed
+
+if(
+player.x < car.x + car.w &&
+player.x + player.w > car.x &&
+player.y < car.y + car.h &&
+player.y + player.h > car.y
+){
+alert("💥 Chocaste! Puntaje: "+score)
+location.reload()
+}
+
+})
+
+cars = cars.filter(car=>car.y < canvas.height+100)
+
+score++
+
+}
+
+function draw(){
 
 ctx.clearRect(0,0,canvas.width,canvas.height)
 
-ctx.fillStyle="#00ff88"
+/* carretera */
 
-particles.forEach(p=>{
+ctx.fillStyle="#444"
+ctx.fillRect(0,0,400,600)
 
-p.x+=p.vx
-p.y+=p.vy
+/* lineas */
 
-if(p.x<0||p.x>canvas.width)p.vx*=-1
-if(p.y<0||p.y>canvas.height)p.vy*=-1
+ctx.strokeStyle="white"
+ctx.setLineDash([20,15])
+ctx.lineWidth=4
 
 ctx.beginPath()
-ctx.arc(p.x,p.y,p.size,0,Math.PI*2)
-ctx.fill()
+ctx.moveTo(133,0)
+ctx.lineTo(133,600)
+ctx.stroke()
 
+ctx.beginPath()
+ctx.moveTo(266,0)
+ctx.lineTo(266,600)
+ctx.stroke()
+
+ctx.setLineDash([])
+
+/* auto jugador */
+
+ctx.fillStyle="lime"
+ctx.fillRect(player.x,player.y,player.w,player.h)
+
+/* autos enemigos */
+
+ctx.fillStyle="red"
+
+cars.forEach(car=>{
+ctx.fillRect(car.x,car.y,car.w,car.h)
 })
 
-requestAnimationFrame(animateBg)
+/* puntaje */
+
+ctx.fillStyle="white"
+ctx.fillText("Puntos: "+score,10,20)
+
+ctx.fillText("Velocidad: "+gameSpeed.toFixed(1),10,40)
 
 }
 
-animateBg()
+function gameLoop(){
 
-
-function generar(){
-
-let device=document.getElementById("device").value
-
-let base=150
-
-if(device=="Samsung") base=160
-if(device=="Xiaomi") base=158
-if(device=="Redmi") base=155
-if(device=="Poco") base=165
-if(device=="Huawei") base=150
-if(device=="Honor") base=152
-if(device=="Motorola") base=148
-if(device=="Realme") base=160
-if(device=="Oppo") base=158
-if(device=="Vivo") base=159
-if(device=="OnePlus") base=170
-if(device=="Asus") base=172
-if(device=="ROG Phone") base=180
-if(device=="Black Shark") base=178
-if(device=="Lenovo") base=150
-if(device=="Nokia") base=145
-if(device=="Sony") base=150
-if(device=="LG") base=147
-if(device=="ZTE") base=150
-if(device=="Google Pixel") base=165
-if(device=="iPhone") base=175
-if(device=="iPad") base=170
-if(device=="PC Gamer") base=120
-if(device=="Laptop") base=125
-if(device=="Tablet Android") base=165
-
-/* Sensibilidad más precisa */
-
-function variar(valor,rango){
-return valor + Math.floor(Math.random()*rango*2 - rango)
-}
-
-/* Sensibilidad PvP más fuerte y precisa */
-
-let general=Math.min(variar(base+10,4),200)
-
-/* punto rojo casi igual al general */
-let redDot=Math.min(variar(Math.round(general*0.99),3),200)
-
-/* scopes más controlados */
-let x2=Math.min(variar(Math.round(general*0.80),3),200)
-
-let x4=Math.min(variar(Math.round(general*0.65),3),200)
-
-/* sniper estable para precisión */
-let sniper=Math.min(variar(Math.round(general*0.50),2),200)
-
-/* CAMARA 360 MAX 100 */
-let cam360=Math.min(variar(Math.round(general*0.55),2),100)
-
-document.getElementById("resultado").innerHTML=
-
-`
-DISPOSITIVO: ${device}
-<br><br>
-
-GENERAL: ${general}
-<br>
-MIRA DE PUNTO ROJO: ${redDot}
-<br>
-MIRA X2: ${x2}
-<br>
-MIRA X4: ${x4}
-<br>
-MIRA FRANCOTIRADOR: ${sniper}
-<br>
-BOTON DE CAMARA 360º: ${cam360}
-<br>
-
-`
+update()
+draw()
+requestAnimationFrame(gameLoop)
 
 }
+
+gameLoop()
 
 </script>
 
