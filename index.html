@@ -3,236 +3,444 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Casino Ficticio Avanzado</title>
+<title>Gran Casino Virtual</title>
+<!-- Google Fonts para estilo bonito -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet" />
 <style>
   body {
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    color: #fff;
     margin: 0;
-    padding: 20px;
-    text-align: center;
+    padding: 0;
+    font-family: 'Orbitron', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #fff;
+    overflow-x: hidden;
   }
 
-  h1 {
-    margin-bottom: 10px;
+  header {
+    background-color: rgba(0,0,0,0.7);
+    padding: 20px;
+    text-align: center;
+    font-size: 2em;
+    letter-spacing: 2px;
   }
 
   #saldo {
-    font-size: 20px;
-    margin-bottom: 20px;
+    font-size: 1.2em;
+    margin: 10px 0;
   }
 
-  /* Estilo para la máquina tragamonedas */
-  #slotMachine {
+  /* Menú de juegos */
+  #menu {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
     margin: 20px 0;
   }
 
+  .game-btn {
+    background-color: #3498db;
+    margin: 10px;
+    padding: 15px 25px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background 0.3s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+
+  .game-btn:hover {
+    background-color: #2980b9;
+  }
+
+  /* Contenedores de juegos */
+  #gamesContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  /* Estilo para cada juego */
+  .game {
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    margin: 10px;
+    padding: 20px;
+    min-width: 300px;
+    max-width: 600px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+
+  /* Títulos de juegos */
+  .game h2 {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+  /* Estilo de botones internos */
+  .btn {
+    background-color: #e67e22;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px 0;
+    font-size: 1.1em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .btn:hover {
+    background-color: #d35400;
+  }
+
+  /* Visualización del saldo y resultados */
+  #resultados {
+    margin-top: 15px;
+    font-size: 1.2em;
+    text-align: center;
+  }
+
+  /* Estilos específicos para cada juego */
+  /* Tragaperras */
+  #tragaperras {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   .reel {
     width: 80px;
     height: 80px;
     margin: 0 10px;
     font-size: 50px;
-    background-color: rgba(255,255,255,0.2);
+    background: #fff;
     border-radius: 10px;
     display: flex;
-    align-items: center;
     justify-content: center;
-    box-shadow: 0 0 10px #000;
-  }
-
-  button {
-    padding: 15px 30px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    background-color: #27ae60;
-    color: #fff;
-    cursor: pointer;
-    margin: 10px;
-    transition: background-color 0.3s;
-  }
-
-  button:hover {
-    background-color: #2ecc71;
+    align-items: center;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
   }
 
   /* Ruleta */
-  #rouletteContainer {
-    margin-top: 40px;
-  }
-
-  #roulette {
+  #ruleta {
     width: 300px;
     height: 300px;
-    margin: 0 auto;
-    border: 10px solid #fff;
     border-radius: 50%;
+    border: 8px solid #fff;
+    margin: 20px auto;
     position: relative;
     overflow: hidden;
-    background: radial-gradient(circle at center, #ffe600, #ff8c00);
-    box-shadow: inset 0 0 20px #000;
+    background: conic-gradient(
+      red 0deg 60deg,
+      black 60deg 120deg,
+      red 120deg 180deg,
+      black 180deg 240deg,
+      red 240deg 300deg,
+      black 300deg 360deg
+    );
+    transition: transform 4s cubic-bezier(0.33, 1, 0.68, 1);
   }
-
   #pointer {
     position: absolute;
     top: -20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 0; 
-    height: 0; 
+    width: 0; height: 0;
     border-left: 20px solid transparent;
     border-right: 20px solid transparent;
     border-bottom: 20px solid #fff;
   }
-
-  #spinBtn {
-    margin-top: 20px;
+  #spinRuleta {
+    display: block;
+    margin: 20px auto;
+    padding: 12px 24px;
+    font-size: 1.2em;
+    border-radius: 8px;
+    border: none;
+    background-color: #27ae60;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  #spinRuleta:hover {
+    background-color: #2ecc71;
   }
 
-  #result {
-    margin-top: 20px;
-    font-size: 24px;
+  /* Blackjack y Dados */
+  #blackjack, #dados {
+    text-align: center;
   }
+  /* Para simplificar, solo botones y texto */
+
 </style>
 </head>
 <body>
 
-<h1>Casino Ficticio Avanzado</h1>
-<div id="saldo">Saldo: <span id="saldoValor">1000</span> créditos</div>
+<header>
+  🎰 Gran Casino Virtual 🎲
+</header>
 
-<!-- Máquina tragamonedas -->
-<h2>Máquina Tragamonedas</h2>
-<div id="slotMachine">
-  <div class="reel" id="reel1">🍒</div>
-  <div class="reel" id="reel2">🍒</div>
-  <div class="reel" id="reel3">🍒</div>
+<div id="saldo">Saldo: <span id="saldoValor">5000</span> créditos</div>
+
+<!-- Menú de juegos -->
+<div id="menu">
+  <button class="game-btn" onclick="mostrarJuego('tragaperras')">Tragaperras</button>
+  <button class="game-btn" onclick="mostrarJuego('ruleta')">Ruleta</button>
+  <button class="game-btn" onclick="mostrarJuego('blackjack')">Blackjack</button>
+  <button class="game-btn" onclick="mostrarJuego('dados')">Dados</button>
 </div>
-<button id="spinBtn">¡Girar!</button>
-<div id="slotResult"></div>
 
-<!-- Ruleta -->
-<h2>Ruleta</h2>
-<div id="rouletteContainer">
-  <div id="roulette">
-    <div id="pointer"></div>
-    <!-- La ruleta tendrá segmentos de colores -->
+<!-- Contenedor de juegos -->
+<div id="gamesContainer">
+
+  <!-- Tragaperras -->
+  <div class="game" id="tragaperras" style="display:none;">
+    <h2>Tragaperras</h2>
+    <div style="display:flex; justify-content:center;">
+      <div class="reel" id="tReel1">🍒</div>
+      <div class="reel" id="tReel2">🍒</div>
+      <div class="reel" id="tReel3">🍒</div>
+    </div>
+    <button class="btn" onclick="jugarTragaperras()">Girar</button>
+    <div id="tragaperrasResultado"></div>
   </div>
-  <button id="spinRoulette">Girar Ruleta</button>
+
+  <!-- Ruleta -->
+  <div class="game" id="ruleta" style="display:none;">
+    <h2>Ruleta</h2>
+    <div id="ruleta">
+      <div id="pointer"></div>
+    </div>
+    <button id="spinRuleta" onclick="girarRuleta()">Girar Ruleta</button>
+    <div id="ruletaResultado"></div>
+  </div>
+
+  <!-- Blackjack -->
+  <div class="game" id="blackjack" style="display:none;">
+    <h2>Blackjack</h2>
+    <div>
+      <p id="bjStatus">Tu saldo: <span id="bjSaldo">1000</span></p>
+      <button class="btn" onclick="comenzarBlackjack()">Comenzar Blackjack</button>
+      <div id="bjJuego" style="display:none;">
+        <div id="cartasJugador"></div>
+        <div id="cartasCrupier"></div>
+        <button class="btn" onclick="pedirCarta()">Pedir Carta</button>
+        <button class="btn" onclick="plantarse()">Plantarse</button>
+      </div>
+      <div id="bjResultado"></div>
+    </div>
+  </div>
+
+  <!-- Dados -->
+  <div class="game" id="dados" style="display:none;">
+    <h2>Dados</h2>
+    <p>Gira los dados y gana si sacas más de 7 en total.</p>
+    <button class="btn" onclick="tirarDados()">Tirar Dados</button>
+    <div id="dadosResultado"></div>
+  </div>
+
 </div>
-<div id="result"></div>
 
 <!-- Música de fondo -->
-<audio id="musicaFondo" autoplay loop>
-  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg" />
-  Tu navegador no soporta audio.
-</audio>
+<audio autoplay loop volume="0.2" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
 
 <script>
-  let saldo = 1000;
-  const saldoSpan = document.getElementById('saldoValor');
+  // Mostrar solo el juego seleccionado
+  function mostrarJuego(juego) {
+    const juegos = ['tragaperras','ruleta','blackjack','dados'];
+    juegos.forEach(j => {
+      document.getElementById(j).style.display = (j===juego)?'block':'none';
+    });
+    // Reiniciar resultados
+    document.getElementById('tragaperrasResultado') && (document.getElementById('tragaperrasResultado').innerText='');
+    document.getElementById('ruletaResultado') && (document.getElementById('ruletaResultado').innerText='');
+    document.getElementById('bjResultado') && (document.getElementById('bjResultado').innerText='');
+    document.getElementById('dadosResultado') && (document.getElementById('dadosResultado').innerText='');
+  }
 
-  // Datos para la tragamonedas
-  const simbolos = ['🍒', '🍋', '🔔', '⭐', '🍀'];
-  const reels = [
-    document.getElementById('reel1'),
-    document.getElementById('reel2'),
-    document.getElementById('reel3')
-  ];
-
-  document.getElementById('spinBtn').addEventListener('click', () => {
-    if (saldo < 50) {
-      alert('No tienes suficiente saldo para jugar.');
+  // =======================
+  // Tragaperras
+  // =======================
+  const simbolos = ['🍒','🍋','🔔','⭐','🍀'];
+  function jugarTragaperras() {
+    if (parseInt(saldo) < 50) {
+      alert('Saldo insuficiente');
       return;
     }
-    saldo -= 50; // apuesta
-    saldoSpan.innerText = saldo;
+    saldo -= 50;
+    actualizarSaldo();
 
-    // Animar los carretes
-    let results = [];
-    for (let i=0; i<3; i++) {
-      const rand = Math.floor(Math.random() * simbolos.length);
-      reels[i].innerText = simbolos[rand];
-      results.push(simbolos[rand]);
-    }
+    const r1 = simbolos[Math.floor(Math.random()*simbolos.length)];
+    const r2 = simbolos[Math.floor(Math.random()*simbolos.length)];
+    const r3 = simbolos[Math.floor(Math.random()*simbolos.length)];
+    document.getElementById('tReel1').innerText = r1;
+    document.getElementById('tReel2').innerText = r2;
+    document.getElementById('tReel3').innerText = r3;
 
-    // Verificar coincidencias
-    if (results[0] === results[1] && results[1] === results[2]) {
+    if (r1===r2 && r2===r3) {
       const premio = 200;
       saldo += premio;
-      saldoSpan.innerText = saldo;
-      document.getElementById('slotResult').innerText = '¡Ganaste ' + premio + ' créditos!';
-    } else {
-      document.getElementById('slotResult').innerText = 'Inténtalo de nuevo!';
+      alert('¡Ganaste '+premio+' créditos!');
     }
-  });
+    actualizarSaldo();
+  }
 
+  // =======================
   // Ruleta
-  const roulette = document.getElementById('roulette');
-  const pointer = document.getElementById('pointer');
-  const resultDiv = document.getElementById('result');
-  const spinRouletteBtn = document.getElementById('spinRoulette');
-
-  // Segmentos de la ruleta
-  const segments = ['rojo', 'negro', 'rojo', 'negro', 'rojo', 'negro'];
-  // Crear segmentos visuales
-  segments.forEach((color, index) => {
-    const segment = document.createElement('div');
-    segment.style.position = 'absolute';
-    segment.style.width = '50%';
-    segment.style.height = '50%';
-    segment.style.backgroundColor = color;
-    segment.style.transform = `rotate(${index * 60}deg) skewY(-30deg)`;
-    segment.style.transformOrigin = 'bottom right';
-    roulette.appendChild(segment);
-  });
-
-  let spinning = false;
-
-  document.getElementById('spinRoulette').addEventListener('click', () => {
-    if (spinning || saldo < 100) {
+  // =======================
+  let girando = false;
+  function girarRuleta() {
+    if (girando || parseInt(saldo)<100) {
       alert('No puedes girar ahora.');
       return;
     }
-    saldo -= 100; // apuesta
-    saldoSpan.innerText = saldo;
-    spinning = true;
-    resultDiv.innerText = '';
+    saldo -= 100;
+    actualizarSaldo();
+    girando=true;
+    const roulette = document.getElementById('ruleta');
+    const degrees = Math.floor(Math.random()*3600)+360; // mínimo 10 vueltas
+    roulette.style.transition='transform 4s cubic-bezier(0.33,1,0.68,1)';
+    roulette.style.transform=`rotate(${degrees}deg)`;
 
-    // Rotar la ruleta
-    const rotations = Math.floor(Math.random() * 360) + 720; // mínimo 2 vueltas
-    const duration = 4000; // ms
-    const start = performance.now();
-
-    function animate(time) {
-      const elapsed = time - start;
-      const progress = Math.min(elapsed / duration, 1);
-      const angle = rotations * progress;
-      roulette.style.transform = `rotate(${angle}deg)`;
-      if (progress < 1) {
-        requestAnimationFrame(animate);
+    setTimeout(()=>{
+      // determinar resultado
+      const finalDeg = degrees%360;
+      const index = Math.floor(finalDeg/60);
+      const color = ['rojo','negro','rojo','negro','rojo','negro'][index];
+      if (color==='rojo') {
+        const premio=300;
+        saldo+=premio;
+        alert('Ganas '+premio+' créditos!');
       } else {
-        // determinar resultado
-        const finalAngle = rotations % 360;
-        const segmentIndex = Math.floor(finalAngle / 60);
-        const color = segments[segmentIndex];
-        if (color === 'rojo') {
-          // gana
-          const premio = 300;
-          saldo += premio;
-          saldoSpan.innerText = saldo;
-          resultDiv.innerText = '¡Gana! ¡Ganaste ' + premio + ' créditos!';
-        } else {
-          resultDiv.innerText = 'Perdiste en la ruleta.';
-        }
-        spinning = false;
+        alert('Perdiste en la ruleta.');
       }
-    }
-    requestAnimationFrame(animate);
-  });
-</script>
+      actualizarSaldo();
+      girando=false;
+    },4000);
+  }
 
+  // =======================
+  // Blackjack
+  // =======================
+  let bjCartas = [], bjPuntaje=0, bjEnJuego=false, bjApuestas=0;
+  function comenzarBlackjack() {
+    if (parseInt(saldo)<200) {
+      alert('Saldo insuficiente.');
+      return;
+    }
+    saldo -=200;
+    actualizarSaldo();
+    bjCartas=[]; bjPuntaje=0; bjEnJuego=true;
+    document.getElementById('bjJuego').style.display='block';
+    document.getElementById('cartasJugador').innerHTML=''; 
+    document.getElementById('cartasCrupier').innerHTML=''; 
+    document.getElementById('bjResultado').innerText='';
+    // cartas del jugador
+    pedirCartaBJ(); pedirCartaBJ();
+    // cartas del crupier
+    document.getElementById('cartasCrupier').innerHTML='<div>🂠</div><div></div>';
+  }
+  function pedirCartaBJ() {
+    if (!bjEnJuego) return;
+    const carta = obtenerCarta();
+    bjCartas.push(carta);
+    mostrarCartasBJ();
+    if (calcularPuntaje(bjCartas)>21) {
+      finBlackjack();
+    }
+  }
+  function mostrarCartasBJ() {
+    document.getElementById('cartasJugador').innerHTML='';
+    bjCartas.forEach(c => {
+      document.getElementById('cartasJugador').innerHTML+=`<div style="font-size:2em;">${c}</div>`;
+    });
+    // calcular puntaje
+    const punt = calcularPuntaje(bjCartas);
+    document.getElementById('bjStatus').innerText='Tu saldo: '+saldo;
+  }
+  function obtenerCarta() {
+    const cartas = ['🂡','🂢','🂣','🂤','🂥','🂦','🂧','🂨','🂩','🂪','🂫','🂬','🂭'];
+    const valores = [1,2,3,4,5,6,7,8,9,10,10,10,10];
+    const index = Math.floor(Math.random()*cartas.length);
+    return cartas[index];
+  }
+  function calcularPuntaje(cartas) {
+    // Asumes todos con valor 10 para simplificar
+    let total=0;
+    cartas.forEach(c => {
+      if (c==='🂡'||c==='🂢'||c==='🂣'||c==='🂤'||c==='🂥'||c==='🂦'||c==='🂧'||c==='🂨'||c==='🂩'||c==='🂪') {
+        total+=10;
+      } else {
+        total+=1; // simplificación
+      }
+    });
+    return total;
+  }
+  function plantarse() {
+    // El crupier juega
+    let crupierCartas=[obtenerCarta(), obtenerCarta()];
+    let puntCrupier=calcularPuntaje(crupierCartas);
+    while (puntCrupier<17) {
+      crupierCartas.push(obtenerCarta());
+      puntCrupier=calcularPuntaje(crupierCartas);
+    }
+    // Mostrar cartas del crupier
+    document.getElementById('cartasCrupier').innerHTML='';
+    crupierCartas.forEach(c => {
+      document.getElementById('cartasCrupier').innerHTML+=`<div style="font-size:2em;">${c}</div>`;
+    });
+    finBlackjack(crupierCartas,puntCrupier);
+  }
+  function finBlackjack(crupierCartas=[],puntCrupier=0) {
+    const puntJugador=calcularPuntaje(bjCartas);
+    let mensaje='';
+    if (puntJugador>21) {
+      mensaje='Perdiste, te pasaste.';
+    } else if (puntCrupier>21 || puntJugador>puntCrupier) {
+      const premio=500;
+      saldo+=premio;
+      mensaje='¡Ganaste '+premio+' créditos!';
+    } else if (puntJugador===puntCrupier) {
+      saldo+=200; // empate
+      mensaje='Empate, recuperas tu apuesta.';
+    } else {
+      mensaje='Perdiste.';
+    }
+    document.getElementById('bjResultado').innerText=mensaje;
+    actualizarSaldo();
+    bjEnJuego=false;
+    document.getElementById('bjJuego').style.display='none';
+  }
+
+  // =======================
+  // Dados
+  // =======================
+  function tirarDados() {
+    if (parseInt(saldo)<50) {
+      alert('Saldo insuficiente');
+      return;
+    }
+    saldo -=50;
+    const dado1 = Math.ceil(Math.random()*6);
+    const dado2 = Math.ceil(Math.random()*6);
+    const total = dado1+dado2;
+    if (total>7) {
+      saldo+=100;
+      alert(`Sacaste ${dado1} y ${dado2} (total ${total}) ¡Ganaste 100 créditos!`);
+    } else {
+      alert(`Sacaste ${dado1} y ${dado2} (total ${total}) ¡Perdiste!`);
+    }
+    actualizarSaldo();
+  }
+
+  function actualizarSaldo() {
+    document.getElementById('saldoValor').innerText=saldo;
+  }
+
+  // Inicializar saldo
+  let saldo=5000;
+  actualizarSaldo();
+
+</script>
 </body>
 </html>
