@@ -3,73 +3,48 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Tetris en NARANJA</title>
+<title>Tetris Compacto</title>
 <style>
   body {
-    background: #222;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 0;
-    font-family: Arial, sans-serif;
-    color: #fff;
+    background:#222; margin:0; font-family:Arial; display:flex; flex-direction:column; align-items:center; color:#fff;
   }
-  h1 {
-    margin: 10px;
-  }
-  canvas {
-    background: #111;
-    border: 2px solid #0f0;
-    display: block;
-  }
-  #score {
-    margin: 10px;
-    font-size: 1.2em;
-  }
+  canvas { background:#111; margin-top:10px; }
+  #score { margin-top:5px; font-size:1.2em; }
+  #buttons { margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  button { padding:10px; font-size:1em; border:none; border-radius:5px; background:#28a745; color:#fff; cursor:pointer; }
+  button:hover { background:#218838; }
 </style>
 </head>
 <body>
-<h1>Tetris en Verde</h1>
+<h2>Tetris Mini</h2>
+<canvas id="tetris" width="160" height="320"></canvas>
 <div id="score">Puntos: 0</div>
-<canvas id="tetris" width="240" height="400"></canvas>
-
+<div id="buttons">
+  <button onclick="move(-1)">←</button>
+  <button onclick="move(1)">→</button>
+  <button onclick="rotate()">🔄</button>
+  <button onclick="drop()">↓</button>
+</div>
 <script>
-const canvas = document.getElementById('tetris');
-const ctx = canvas.getContext('2d');
+const c=document.getElementById('tetris');
+const ctx=c.getContext('2d');
+const ROWS=16, COLS=8, BLOCK=20;
+let score=0, board=[], current, gameInterval, gameOver=false;
 
-const ROWS = 20;
-const COLS = 10;
-const BLOCK_SIZE = 20;
-
-let score = 0;
-let board = [];
-let currentPiece;
-let gameInterval;
-let gameOver = false;
-
-// Piezas Tetris
-const shapes = [
-  // Cuadrado
+// Formas simples
+const shapes=[
   [[1,1],
    [1,1]],
-  // L
-  [[1,0],
-   [1,0],
-   [1,1]],
-  // J
-  [[0,1],
-   [0,1],
-   [1,1]],
-  // T
-  [[1,1,1],
-   [0,1,0]],
-  // S
-  [[0,1,1],
-   [1,1,0]],
-  // Z
+  [[0,1,0],
+   [1,1,1]],
+  [[1,0,0],
+   [1,1,1]],
+  [[0,0,1],
+   [1,1,1]],
   [[1,1,0],
    [0,1,1]],
-  // Línea
+  [[0,1,1],
+   [1,1,0]],
   [[1],
    [1],
    [1],
@@ -77,142 +52,115 @@ const shapes = [
 ];
 
 function init() {
-  // Crear tablero
-  for(let r=0; r<ROWS; r++) {
-    board[r] = [];
-    for(let c=0; c<COLS; c++) {
-      board[r][c] = 0;
-    }
-  }
-  spawnPiece();
+  for(let r=0; r<ROWS; r++) { board[r]=Array(COLS).fill(0); }
+  spawn();
   document.addEventListener('keydown', handleKey);
-  gameInterval = setInterval(update, 500);
+  gameInterval=setInterval(update, 500);
 }
-
-function spawnPiece() {
-  const shape = shapes[Math.floor(Math.random() * shapes.length)];
-  currentPiece = {
-    shape: shape,
-    row: 0,
-    col: Math.floor(COLS/2) - Math.ceil(shape[0].length/2)
-  };
-  if (collision(currentPiece.shape, currentPiece.row, currentPiece.col)) {
-    clearInterval(gameInterval);
-    alert('¡Juego terminado!');
-    gameOver = true;
+function spawn() {
+  const shape=shapes[Math.floor(Math.random()*shapes.length)];
+  current={shape:shape, row:0, col:Math.floor(COLS/2)-Math.ceil(shape[0].length/2)};
+  if(collision(current.shape, current.row, current.col)){
+    clearInterval(gameInterval); alert('¡Fin!'); gameOver=true;
   }
 }
-
-function collision(shape, row, col) {
-  for(let r=0; r<shape.length; r++) {
-    for(let c=0; c<shape[r].length; c++) {
-      if(shape[r][c]) {
-        let newRow = row + r;
-        let newCol = col + c;
-        if(newRow >= ROWS || newCol < 0 || newCol >= COLS || board[newRow][newCol]) {
-          return true;
-        }
+function collision(shape,r,c){
+  for(let y=0; y<shape.length; y++){
+    for(let x=0; x<shape[y].length; x++){
+      if(shape[y][x]){
+        let ny=r+y, nx=c+x;
+        if(ny>=ROWS || nx<0 || nx>=COLS || board[ny][nx]) return true;
       }
     }
   }
   return false;
 }
-
 function merge() {
-  for(let r=0; r<currentPiece.shape.length; r++) {
-    for(let c=0; c<currentPiece.shape[r].length; c++) {
-      if(currentPiece.shape[r][c]) {
-        board[currentPiece.row + r][currentPiece.col + c] = 1;
+  for(let y=0; y<current.shape.length; y++){
+    for(let x=0; x<current.shape[y].length; x++){
+      if(current.shape[y][x]){
+        board[current.row+y][current.col+x]=1;
       }
     }
   }
   clearLines();
-  spawnPiece();
+  spawn();
 }
-
 function clearLines() {
   for(let r=ROWS-1; r>=0; r--) {
-    if(board[r].every(c => c === 1)) {
+    if(board[r].every(c=>c===1)){
       board.splice(r,1);
-      board.unshift(new Array(COLS).fill(0));
-      score += 100;
-      document.getElementById('score').innerText = 'Puntos: ' + score;
+      board.unshift(Array(COLS).fill(0));
+      score+=100;
+      document.getElementById('score').innerText='Puntos: '+score;
     }
   }
 }
-
-function handleKey(e) {
+function move(dir) {
   if(gameOver) return;
-  if(e.key === 'ArrowLeft') {
-    if(!collision(currentPiece.shape, currentPiece.row, currentPiece.col -1))
-      currentPiece.col--;
-  } else if(e.key === 'ArrowRight') {
-    if(!collision(currentPiece.shape, currentPiece.row, currentPiece.col +1))
-      currentPiece.col++;
-  } else if(e.key === 'ArrowDown') {
-    if(!collision(currentPiece.shape, currentPiece.row +1, currentPiece.col))
-      currentPiece.row++;
-    else {
-      merge();
-    }
-  } else if(e.key === 'ArrowUp') {
-    // rotar
-    const rotated = rotate(currentPiece.shape);
-    if(!collision(rotated, currentPiece.row, currentPiece.col))
-      currentPiece.shape = rotated;
+  const newCol=current.col+dir;
+  if(!collision(current.shape,current.row,newCol)){
+    current.col=newCol;
   }
-  draw();
 }
-
-function rotate(shape) {
-  const rows = shape.length;
-  const cols = shape[0].length;
-  const newShape = [];
-  for(let c=0; c<cols; c++) {
-    newShape[c] = [];
-    for(let r=rows-1; r>=0; r--) {
-      newShape[c][rows-1-r] = shape[r][c];
+function rotate() {
+  if(gameOver) return;
+  const rotated=rotateShape(current.shape);
+  if(!collision(rotated,current.row,current.col)){
+    current.shape=rotated;
+  }
+}
+function rotateShape(shape) {
+  const r=shape.length, c=shape[0].length;
+  const newShape=[];
+  for(let x=0; x<c; x++){
+    newShape[x]=[];
+    for(let y=r-1; y>=0; y--){
+      newShape[x][r-1-y]=shape[y][x];
     }
   }
   return newShape;
 }
-
-function update() {
+function drop() {
   if(gameOver) return;
-  if(!collision(currentPiece.shape, currentPiece.row +1, currentPiece.col))
-    currentPiece.row++;
-  else {
+  while(!collision(current.shape,current.row+1,current.col)){
+    current.row++;
+  }
+  merge();
+}
+function update() {
+  if(collision(current.shape,current.row+1,current.col)){
     merge();
+  } else {
+    current.row++;
   }
   draw();
 }
-
 function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  // dibujar tablero
-  for(let r=0; r<ROWS; r++) {
-    for(let c=0; c<COLS; c++) {
-      if(board[r][c]) {
-        ctx.fillStyle = 'green';
-        ctx.fillRect(c*BLOCK_SIZE, r*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  ctx.clearRect(0,0,c.width,c.height);
+  // tablero
+  for(let y=0; y<ROWS; y++){
+    for(let x=0; x<COLS; x++){
+      if(board[y][x]){
+        ctx.fillStyle='lime';
+        ctx.fillRect(x*BLOCK,y*BLOCK,BLOCK,BLOCK);
         ctx.strokeStyle='black';
-        ctx.strokeRect(c*BLOCK_SIZE, r*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+        ctx.strokeRect(x*BLOCK,y*BLOCK,BLOCK,BLOCK);
       }
     }
   }
-  // dibujar pieza actual
-  for(let r=0; r<currentPiece.shape.length; r++) {
-    for(let c=0; c<currentPiece.shape[r].length; c++) {
-      if(currentPiece.shape[r][c]) {
-        ctx.fillStyle='green';
-        ctx.fillRect((currentPiece.col + c)*BLOCK_SIZE, (currentPiece.row + r)*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  // pieza actual
+  for(let y=0; y<current.shape.length; y++){
+    for(let x=0; x<current.shape[y].length; x++){
+      if(current.shape[y][x]){
+        ctx.fillStyle='lime';
+        ctx.fillRect((current.col+x)*BLOCK,(current.row+y)*BLOCK,BLOCK,BLOCK);
         ctx.strokeStyle='black';
-        ctx.strokeRect((currentPiece.col + c)*BLOCK_SIZE, (currentPiece.row + r)*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+        ctx.strokeRect((current.col+x)*BLOCK,(current.row+y)*BLOCK,BLOCK,BLOCK);
       }
     }
   }
 }
-
 init();
 </script>
 </body>
