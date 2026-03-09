@@ -3,203 +3,185 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Calculadora Científica Móvil</title>
+<title>Preguntados - Juego de Preguntas</title>
 <style>
   body {
-    margin: 0;
     font-family: 'Arial', sans-serif;
-    background-color: #222;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    background: linear-gradient(135deg, #4e54c8, #8f94fb);
+    margin: 0;
+    padding: 20px;
+    color: #fff;
   }
-
-  .calculator {
-    background-color: #333;
-    border-radius: 10px;
-    padding: 10px;
-    width: 95%;
-    max-width: 400px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  h1 {
+    text-align: center;
   }
-
-  #display {
-    background-color: #000;
-    color: #0f0;
-    font-size: 2em;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    min-height: 50px;
-    text-align: right;
-    word-wrap: break-word;
-  }
-
-  .buttons {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-  }
-
-  button {
+  #score {
     font-size: 1.2em;
+    margin: 10px 0;
+  }
+  #question-container {
+    max-width: 800px;
+    margin: auto;
+    background: rgba(255,255,255,0.2);
+    padding: 20px;
+    border-radius: 15px;
+  }
+  #question {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+  }
+  .answer-btn {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
     padding: 15px;
+    font-size: 1.2em;
     border: none;
-    border-radius: 8px;
-    background-color: #555;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: #fff;
+    color: #333;
+    transition: background 0.3s;
+  }
+  .answer-btn:hover {
+    background-color: #ddd;
+  }
+  #nextBtn {
+    display: none;
+    margin: 20px auto;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 10px;
+    background-color: #28a745;
     color: #fff;
     cursor: pointer;
-    transition: background 0.2s;
   }
-
-  button:hover {
-    background-color: #777;
+  #nextBtn:hover {
+    background-color: #218838;
   }
 </style>
 </head>
 <body>
 
-<div class="calculator">
-  <div id="display">0</div>
-  <div class="buttons">
-    <button onclick="clearDisplay()">C</button>
-    <button onclick="toggleSign()">±</button>
-    <button onclick="calculate('sin')">sin</button>
-    <button onclick="calculate('cos')">cos</button>
-
-    <button onclick="appendNumber('7')">7</button>
-    <button onclick="appendNumber('8')">8</button>
-    <button onclick="appendNumber('9')">9</button>
-    <button onclick="calculate('/')">/</button>
-
-    <button onclick="appendNumber('4')">4</button>
-    <button onclick="appendNumber('5')">5</button>
-    <button onclick="appendNumber('6')">6</button>
-    <button onclick="calculate('*')">*</button>
-
-    <button onclick="appendNumber('1')">1</button>
-    <button onclick="appendNumber('2')">2</button>
-    <button onclick="appendNumber('3')">3</button>
-    <button onclick="calculate('-')">-</button>
-
-    <button onclick="appendNumber('0')">0</button>
-    <button onclick="appendNumber('.')">.</button>
-    <button onclick="calculate('^')">^</button>
-    <button onclick="calculate('+')">+</button>
-
-    <button onclick="calculate('sqrt')">√</button>
-    <button onclick="calculate('log')">log</button>
-    <button onclick="calculate('tan')">tan</button>
-    <button onclick="calculate('')">=</button>
-  </div>
+<h1>Preguntados - Juego de Preguntas</h1>
+<div id="score">Puntuación: 0</div>
+<div id="question-container">
+  <div id="question">Cargando pregunta...</div>
+  <button class="answer-btn" id="answer0" onclick="selectAnswer(0)"></button>
+  <button class="answer-btn" id="answer1" onclick="selectAnswer(1)"></button>
+  <button class="answer-btn" id="answer2" onclick="selectAnswer(2)"></button>
+  <button class="answer-btn" id="answer3" onclick="selectAnswer(3)"></button>
+  <button id="nextBtn" onclick="nextQuestion()">Siguiente</button>
 </div>
 
 <script>
-let currentInput = '';
-let lastOperator = '';
-let lastNumber = '';
-let resultDisplayed = false;
+const preguntas = [
+  {
+    pregunta: "¿Cuál es la capital de Francia?",
+    respuestas: ["Madrid", "París", "Londres", "Roma"],
+    correcta: 1
+  },
+  {
+    pregunta: "¿Qué elemento tiene el símbolo químico 'O'?",
+    respuestas: ["Oxígeno", "Oro", "Ozono", "Oxalato"],
+    correcta: 0
+  },
+  {
+    pregunta: "¿En qué año llegó el hombre a la Luna por primera vez?",
+    respuestas: ["1969", "1972", "1959", "1980"],
+    correcta: 0
+  },
+  {
+    pregunta: "¿Cuál es el idioma más hablado del mundo?",
+    respuestas: ["Inglés", "Chino mandarín", "Español", "Hindú"],
+    correcta: 1
+  },
+  {
+    pregunta: "¿Qué planeta es conocido como el planeta rojo?",
+    respuestas: ["Venus", "Marte", "Júpiter", "Saturno"],
+    correcta: 1
+  }
+];
 
-const display = document.getElementById('display');
+let currentIndex = 0;
+let puntuacion = 0;
+let respuestaSeleccionada = null;
 
-function updateDisplay() {
-  if(currentInput === '') {
-    display.innerText = '0';
+const questionEl = document.getElementById('question');
+const answerButtons = [
+  document.getElementById('answer0'),
+  document.getElementById('answer1'),
+  document.getElementById('answer2'),
+  document.getElementById('answer3')
+];
+const nextBtn = document.getElementById('nextBtn');
+const scoreEl = document.getElementById('score');
+
+function cargarPregunta() {
+  const pregunta = preguntas[currentIndex];
+  questionEl.innerText = pregunta.pregunta;
+  for (let i=0; i<4; i++) {
+    answerButtons[i].innerText = pregunta.respuestas[i];
+    answerButtons[i].style.backgroundColor = '#fff';
+    answerButtons[i].disabled = false;
+  }
+  nextBtn.style.display = 'none';
+  respuestaSeleccionada = null;
+}
+
+function selectAnswer(index) {
+  // Resalta la respuesta seleccionada
+  for (let i=0; i<4; i++) {
+    answerButtons[i].style.backgroundColor = '#fff';
+  }
+  answerButtons[index].style.backgroundColor = '#007bff';
+  respuestaSeleccionada = index;
+  // Habilitar botón Siguiente
+  document.getElementById('nextBtn').style.display='block';
+}
+
+function nextQuestion() {
+  const pregunta = preguntas[currentIndex];
+  if (respuestaSeleccionada === null) return; // sin respuesta
+
+  // Ver si fue correcta
+  if (respuestaSeleccionada === pregunta.correcta) {
+    answerButtons[respuestaSeleccionada].style.backgroundColor = 'green';
+    puntuacion++;
   } else {
-    display.innerText = currentInput;
+    answerButtons[respuestaSeleccionada].style.backgroundColor = 'red';
+    answerButtons[pregunta.correcta].style.backgroundColor = 'green';
   }
-}
 
-function appendNumber(num) {
-  if(resultDisplayed) {
-    currentInput = '';
-    resultDisplayed = false;
+  // Deshabilitar botones
+  for (let btn of answerButtons) {
+    btn.disabled = true;
   }
-  currentInput += num;
-  updateDisplay();
-}
 
-function clearDisplay() {
-  currentInput = '';
-  lastOperator = '';
-  lastNumber = '';
-  resultDisplayed = false;
-  updateDisplay();
-}
+  // Actualizar puntaje
+  scoreEl.innerText = 'Puntuación: ' + puntuacion;
 
-function toggleSign() {
-  if(currentInput.startsWith('-')) {
-    currentInput = currentInput.substring(1);
-  } else if(currentInput !== '') {
-    currentInput = '-' + currentInput;
-  }
-  updateDisplay();
-}
-
-function calculate(func) {
-  if(func === 'sin' || func === 'cos' || func === 'tan' || func === 'log' || func === 'sqrt') {
-    // Funciones trig y log
-    let num = parseFloat(currentInput);
-    if(isNaN(num)) return;
-    let res = 0;
-    switch(func) {
-      case 'sin': res = Math.sin(toRadians(num)); break;
-      case 'cos': res = Math.cos(toRadians(num)); break;
-      case 'tan': res = Math.tan(toRadians(num)); break;
-      case 'log': res = Math.log10(num); break;
-      case 'sqrt': res = Math.sqrt(num); break;
-    }
-    currentInput = res.toString();
-    updateDisplay();
-    resultDisplayed = true;
-  } else if(func === '^') {
-    lastNumber = currentInput;
-    lastOperator = '^';
-    currentInput = '';
-  } else if(func === 'log') {
-    let num = parseFloat(currentInput);
-    if(!isNaN(num) && num>0) {
-      currentInput = Math.log10(num).toString();
-      updateDisplay();
-      resultDisplayed = true;
-    }
-  } else if(func === '') {
-    // Igual
-    if(lastOperator && lastNumber !== '' && currentInput !== '') {
-      const num1 = parseFloat(lastNumber);
-      const num2 = parseFloat(currentInput);
-      let res = 0;
-      switch(lastOperator) {
-        case '+': res = num1 + num2; break;
-        case '-': res = num1 - num2; break;
-        case '*': res = num1 * num2; break;
-        case '/': res = num2 !== 0 ? num1 / num2 : 'Error'; break;
-        case '^': res = Math.pow(num1, num2); break;
-      }
-      currentInput = res.toString();
-      updateDisplay();
-      lastOperator = '';
-      lastNumber = '';
-      resultDisplayed = true;
-    }
+  // Preparar para la siguiente
+  currentIndex++;
+  if (currentIndex < preguntas.length) {
+    setTimeout(cargarPregunta, 1500);
   } else {
-    // Operador
-    if(currentInput === '') return;
-    if(lastOperator !== '') {
-      // Calculamos previo
-      calculate('');
-    }
-    lastNumber = currentInput;
-    lastOperator = func;
-    currentInput = '';
+    setTimeout(finJuego, 1500);
   }
 }
 
-// Función para convertir grados a radianes
-function toRadians(deg) {
-  return deg * Math.PI / 180;
+function finJuego() {
+  questionEl.innerText = '¡Juego terminado! Tu puntuación final es ' + puntuacion + '/' + preguntas.length;
+  for (let btn of answerButtons) {
+    btn.style.display='none';
+  }
+  document.getElementById('nextBtn').style.display='none';
 }
+
+window.onload = () => {
+  cargarPregunta();
+};
 </script>
 
 </body>
