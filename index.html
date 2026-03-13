@@ -72,6 +72,11 @@ Presiona iniciar para comenzar el video
 
 <button onclick="iniciar()">▶ Iniciar video</button>
 
+<!-- Música de fondo -->
+<audio id="musica" loop>
+<source src="musica.mp3" type="audio/mpeg">
+</audio>
+
 <script>
 
 let imagenes=[
@@ -101,13 +106,10 @@ let i=0;
 
 function iniciar(){
 
+document.getElementById("musica").volume = 0.3;
+document.getElementById("musica").play();
+
 cambiarImagen();
-
-let voz=new SpeechSynthesisUtterance(textos.join(". "));
-voz.lang="es-ES";
-voz.rate=0.95;
-
-speechSynthesis.speak(voz);
 
 }
 
