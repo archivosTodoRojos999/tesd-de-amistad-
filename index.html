@@ -2,130 +2,183 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Sobrevivir a la Escuela Marcelino Blanco</title>
+<title>Terminal Hack</title>
 
 <style>
 
 body{
-font-family: Arial;
-background:#111;
-color:white;
-text-align:center;
 margin:0;
+background:black;
+color:#00ff9c;
+font-family:monospace;
+overflow:hidden;
 }
 
-h1{
-padding:20px;
+canvas{
+position:absolute;
+top:0;
+left:0;
 }
 
-#video{
-width:800px;
-max-width:90%;
-margin:auto;
-position:relative;
-}
-
-#imagen{
-width:100%;
-height:450px;
-object-fit:cover;
-border-radius:10px;
-}
-
-#subtitulo{
+#terminal{
 position:absolute;
 bottom:20px;
-left:0;
-right:0;
-font-size:22px;
-background:rgba(0,0,0,0.5);
-padding:10px;
+left:20px;
+font-size:18px;
+width:90%;
 }
 
-button{
-margin-top:20px;
-padding:12px 20px;
-font-size:18px;
-border:none;
-border-radius:8px;
-background:#00c3ff;
-cursor:pointer;
+#panel{
+display:none;
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:black;
+color:#00ff9c;
+text-align:center;
+padding-top:20vh;
+font-size:40px;
 }
 
 </style>
-
 </head>
 
 <body>
 
-<h1>¡Sobrevivir a la Escuela Marcelino Blanco!</h1>
+<canvas id="matrix"></canvas>
 
-<div id="video">
+<div id="terminal"></div>
 
-<img id="imagen" src="img1.jpg">
-
-<div id="subtitulo">
-Presiona iniciar para comenzar el video
+<div id="panel">
+⚠ ACCESS GRANTED ⚠
+<br><br>
+GLOBAL NETWORK CONTROL
 </div>
-
-</div>
-
-<button onclick="iniciar()">▶ Iniciar video</button>
-
-<!-- Música de fondo -->
-<audio id="musica" loop>
-<source src="musica.mp3" type="audio/mpeg">
-</audio>
 
 <script>
 
-let imagenes=[
-"img1.jpg",
-"img2.jpg",
-"img3.jpg",
-"img4.jpg",
-"img5.jpg"
-];
+// MATRIX CODE RAIN
 
-let textos=[
+const canvas = document.getElementById("matrix")
+const ctx = canvas.getContext("2d")
 
-"Hola chicos, bienvenidos a la escuela Marcelino Blanco. Soy Luciano Sala y estoy aquí para ayudarlos a comenzar este nuevo año.",
+canvas.height = window.innerHeight
+canvas.width = window.innerWidth
 
-"La escuela es como un juego. Tendrán desafíos, harán amigos y aprenderán muchas cosas nuevas.",
+const letters = "01アカサタナハマヤラワABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&"
+const fontSize = 16
+const columns = canvas.width / fontSize
 
-"No se preocupen si al principio no saben todo. Eso es parte de estar en primer año.",
+const drops = []
 
-"Algunos consejos para sobrevivir: no tengan miedo de preguntar, hagan amigos y trabajen en equipo.",
+for(let i=0;i<columns;i++){
+drops[i]=1
+}
 
-"Recuerden: la escuela es un lugar para aprender, crecer y divertirse.",
+function draw(){
 
-"¡Buena suerte chicos! Vamos a hacer que este año sea inolvidable."
-];
+ctx.fillStyle="rgba(0,0,0,0.05)"
+ctx.fillRect(0,0,canvas.width,canvas.height)
 
-let i=0;
+ctx.fillStyle="#00ff9c"
+ctx.font=fontSize+"px monospace"
 
-function iniciar(){
+for(let i=0;i<drops.length;i++){
 
-document.getElementById("musica").volume = 0.3;
-document.getElementById("musica").play();
+const text = letters.charAt(Math.floor(Math.random()*letters.length))
 
-cambiarImagen();
+ctx.fillText(text,i*fontSize,drops[i]*fontSize)
+
+if(drops[i]*fontSize > canvas.height && Math.random()>0.975){
+drops[i]=0
+}
+
+drops[i]++
 
 }
 
-function cambiarImagen(){
+}
 
-document.getElementById("imagen").src=imagenes[i];
+setInterval(draw,35)
 
-document.getElementById("subtitulo").innerText=textos[i] || "";
 
-i++;
+// TERMINAL TEXT
 
-if(i<imagenes.length){
+const terminal = document.getElementById("terminal")
 
-setTimeout(cambiarImagen,3000);
+const lines = [
+"Connecting to remote server...",
+"Bypassing firewall...",
+"Injecting payload...",
+"Decrypting security layer...",
+"Accessing private database...",
+"Downloading files...",
+"Removing traces...",
+"Finalizing connection..."
+]
+
+let lineIndex = 0
+let charIndex = 0
+
+function typeLine(){
+
+if(lineIndex >= lines.length){
+
+setTimeout(()=>{
+document.getElementById("panel").style.display="block"
+},2000)
+
+return
+}
+
+let currentLine = lines[lineIndex]
+
+terminal.innerHTML += currentLine.charAt(charIndex)
+
+charIndex++
+
+clickSound()
+
+if(charIndex < currentLine.length){
+
+setTimeout(typeLine,40)
+
+}else{
+
+terminal.innerHTML += "<br>"
+
+lineIndex++
+charIndex=0
+
+setTimeout(typeLine,500)
 
 }
+
+}
+
+setTimeout(typeLine,2000)
+
+
+// TERMINAL SOUND
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+
+function clickSound(){
+
+const osc = audioCtx.createOscillator()
+const gain = audioCtx.createGain()
+
+osc.frequency.value = 200 + Math.random()*400
+
+osc.connect(gain)
+gain.connect(audioCtx.destination)
+
+gain.gain.value = 0.02
+
+osc.start()
+osc.stop(audioCtx.currentTime+0.02)
 
 }
 
