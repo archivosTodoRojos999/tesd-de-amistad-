@@ -3,7 +3,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Catálogo de Canelones</title><style>
-
 body{
 font-family:'Segoe UI',sans-serif;
 margin:0;
@@ -57,7 +56,7 @@ margin-top:35px;
 .card{
 background:white;
 border-radius:16px;
-padding:25px;
+padding:0 0 25px 0;
 box-shadow:0 10px 20px rgba(0,0,0,0.15);
 transition:transform .35s, box-shadow .35s;
 position:relative;
@@ -65,6 +64,16 @@ overflow:hidden;
 opacity:0;
 transform:translateY(40px);
 animation:cardAppear .8s forwards;
+}
+
+.card img{
+width:100%;
+height:170px;
+object-fit:cover;
+}
+
+.card-content{
+padding:20px;
 }
 
 .card:nth-child(2){animation-delay:.2s}
@@ -119,7 +128,6 @@ font-weight:bold;
 animation:pulse 2s infinite;
 }
 
-/* BOTÓN WHATSAPP */
 .whatsapp-btn{
 display:inline-block;
 background:#25D366;
@@ -137,7 +145,6 @@ transition:transform .3s;
 transform:scale(1.1);
 }
 
-/* BOTÓN FLOTANTE */
 .float-wa{
 position:fixed;
 bottom:25px;
@@ -161,8 +168,6 @@ text-align:center;
 padding:25px;
 font-size:14px;
 }
-
-/* ANIMACIONES */
 
 @keyframes slideDown{
 from{transform:translateY(-60px);opacity:0}
@@ -196,36 +201,67 @@ to{opacity:1;transform:translateY(0)}
 <p>Sabores tradicionales hechos con amor</p>
 </header><div class="container"><h2 class="section-title">Nuestro Menú</h2><div class="menu-grid"><div class="card">
 <div class="badge">Popular</div>
+<img src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d" alt="Canelones de carne">
+<div class="card-content">
 <h3>Canelones de Carne</h3>
 <p>Rellenos con carne vacuna, salsa de tomate casera y queso gratinado.</p>
 <div class="price">$5.500</div>
+</div>
 </div><div class="card">
+<img src="https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9" alt="Canelones de pollo">
+<div class="card-content">
 <h3>Canelones de Pollo</h3>
 <p>Pollo desmenuzado con salsa blanca cremosa y queso.</p>
 <div class="price">$5.800</div>
+</div>
 </div><div class="card">
 <div class="badge">Nuevo</div>
+<img src="https://images.unsplash.com/photo-1572441713132-51c75654db73" alt="Canelones de espinaca">
+<div class="card-content">
 <h3>Canelones de Espinaca y Ricota</h3>
 <p>Espinaca fresca con ricota suave y salsa bechamel.</p>
 <div class="price">$5.200</div>
+</div>
 </div><div class="card">
+<img src="https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb" alt="Canelones mixtos">
+<div class="card-content">
 <h3>Canelones Mixtos</h3>
 <p>Combinación de carne y ricota con salsa roja y gratinado.</p>
 <div class="price">$6.000</div>
+</div>
 </div><div class="card">
+<img src="https://images.unsplash.com/photo-1585238342024-78d387f4a707" alt="Canelones jamon y queso">
+<div class="card-content">
 <h3>Canelones de Jamón y Queso</h3>
 <p>Jamón cocido con queso derretido y salsa blanca.</p>
 <div class="price">$5.400</div>
+</div>
 </div><div class="card">
 <div class="badge">Especial</div>
+<img src="https://images.unsplash.com/photo-1613145997970-db84a7975fbb" alt="Canelones premium">
+<div class="card-content">
 <h3>Canelones Premium</h3>
 <p>Relleno especial de carne, verduras salteadas y doble queso gratinado.</p>
 <div class="price">$6.800</div>
+</div>
 </div></div><div style="text-align:center;margin:45px 0;">
 <a class="whatsapp-btn" href="https://wa.me/5492664508808" target="_blank">📲 Pedir por WhatsApp</a>
 </div></div><a class="float-wa" href="https://wa.me/5492664508808" target="_blank">💬</a>
 
-<footer>
+</div><section style="max-width:1000px;margin:40px auto;padding:20px;">
+<h2 style="text-align:center;font-size:32px;color:#b31217;margin-bottom:30px;">⭐ Opiniones de Clientes</h2><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;"><div style="background:white;border-radius:14px;padding:20px;box-shadow:0 8px 18px rgba(0,0,0,0.15);">
+<p>"Los mejores canelones que probé en mucho tiempo. La salsa es increíble."</p>
+<strong>⭐⭐⭐⭐⭐ - María G.</strong>
+</div><div style="background:white;border-radius:14px;padding:20px;box-shadow:0 8px 18px rgba(0,0,0,0.15);">
+<p>"Pedimos para toda la familia y llegaron calientes y riquísimos."</p>
+<strong>⭐⭐⭐⭐⭐ - Carlos R.</strong>
+</div><div style="background:white;border-radius:14px;padding:20px;box-shadow:0 8px 18px rgba(0,0,0,0.15);">
+<p>"Muy buena calidad y porción grande. Seguro vuelvo a pedir."</p>
+<strong>⭐⭐⭐⭐⭐ - Lucía M.</strong>
+</div></div></section></section><section style="max-width:1000px;margin:20px auto 40px auto;padding:20px;text-align:center;">
+<h2 style="font-size:30px;color:#b31217;margin-bottom:20px;">📍 Dónde estamos</h2><p style="font-size:18px;margin-bottom:20px;">Podés encontrarnos en nuestro local o ver la ubicación exacta en el mapa.</p><a href="https://maps.app.goo.gl/me7pPb3vEtjtmwcV9" target="_blank" style="display:inline-block;background:#4285F4;color:white;padding:14px 26px;border-radius:12px;font-size:18px;text-decoration:none;font-weight:bold;box-shadow:0 8px 18px rgba(0,0,0,0.2);">📍 Ver ubicación en Google Maps</a>
+
+</section><footer>
 <p>📍 Pedidos por WhatsApp | 🕒 12:00 a 23:00</p>
 <p>Menú digital - Canelones Caseros</p>
 </footer></body>
