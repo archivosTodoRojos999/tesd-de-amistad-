@@ -10,11 +10,16 @@ header{background:linear-gradient(90deg,#ff512f,#dd2476);color:white;padding:50p
 .menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:25px;margin-top:30px}
 .card{background:white;border-radius:16px;overflow:hidden;box-shadow:0 10px 20px rgba(0,0,0,.15);transition:.3s}
 .card:hover{transform:scale(1.03)}
-.card img{width:100%;height:170px;object-fit:cover}
+.card img{width:100%;height:180px;object-fit:cover}
 .card-content{padding:20px}
 .price{font-size:22px;font-weight:bold;color:#0f9b0f}
 
 .add-btn{margin-top:10px;background:#ff512f;color:white;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+
+.cart-box{position:fixed;bottom:90px;right:20px;background:white;border-radius:12px;padding:15px;width:260px;box-shadow:0 10px 20px rgba(0,0,0,.25)}
+.cart-box h4{margin-top:0}
+.cart-item{font-size:14px;margin:4px 0}
+.cart-btn{background:#25D366;color:white;border:none;padding:10px;border-radius:8px;width:100%;cursor:pointer;margin-top:10px}
 
 .whatsapp-btn{display:inline-block;background:#25D366;color:white;padding:16px 30px;font-size:20px;border-radius:14px;text-decoration:none;font-weight:bold;margin-top:30px}
 
@@ -40,57 +45,60 @@ footer{background:#222;color:white;text-align:center;padding:25px;margin-top:40p
 <p>Sabores tradicionales hechos con amor</p>
 </header><div class="container">
 <h2 class="section-title">Nuestro Menú</h2><div class="menu-grid"><div class="card">
-<img src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d">
+<img src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=800&q=60">
 <div class="card-content">
 <h3>Canelones de Carne</h3>
 <p>Carne con salsa de tomate.</p>
 <div class="price">$5.500</div>
-<button class="add-btn" onclick="addOrder('Canelones de Carne',5500)">Agregar</button>
+<button class="add-btn" onclick="addToCart('Canelones de Carne',5500)">Agregar</button>
 </div>
 </div><div class="card">
-<img src="https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9">
+<img src="https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?auto=format&fit=crop&w=800&q=60">
 <div class="card-content">
 <h3>Canelones de Pollo</h3>
 <p>Pollo con salsa blanca.</p>
 <div class="price">$5.800</div>
-<button class="add-btn" onclick="addOrder('Canelones de Pollo',5800)">Agregar</button>
+<button class="add-btn" onclick="addToCart('Canelones de Pollo',5800)">Agregar</button>
 </div>
 </div><div class="card">
-<img src="https://images.unsplash.com/photo-1572441713132-51c75654db73">
+<img src="https://images.unsplash.com/photo-1572441713132-51c75654db73?auto=format&fit=crop&w=800&q=60">
 <div class="card-content">
 <h3>Espinaca y Ricota</h3>
 <p>Con salsa bechamel.</p>
 <div class="price">$5.200</div>
-<button class="add-btn" onclick="addOrder('Canelones Espinaca Ricota',5200)">Agregar</button>
+<button class="add-btn" onclick="addToCart('Canelones Espinaca Ricota',5200)">Agregar</button>
 </div>
 </div><div class="card">
-<img src="https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb">
+<img src="https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?auto=format&fit=crop&w=800&q=60">
 <div class="card-content">
 <h3>Canelones Mixtos</h3>
 <p>Carne y ricota.</p>
 <div class="price">$6.000</div>
-<button class="add-btn" onclick="addOrder('Canelones Mixtos',6000)">Agregar</button>
+<button class="add-btn" onclick="addToCart('Canelones Mixtos',6000)">Agregar</button>
 </div>
 </div><div class="card">
-<img src="https://images.unsplash.com/photo-1585238342024-78d387f4a707">
+<img src="https://images.unsplash.com/photo-1585238342024-78d387f4a707?auto=format&fit=crop&w=800&q=60">
 <div class="card-content">
 <h3>Jamón y Queso</h3>
 <p>Con salsa blanca.</p>
 <div class="price">$5.400</div>
-<button class="add-btn" onclick="addOrder('Canelones Jamon Queso',5400)">Agregar</button>
+<button class="add-btn" onclick="addToCart('Canelones Jamon Queso',5400)">Agregar</button>
 </div>
 </div><div class="card">
-<img src="https://images.unsplash.com/photo-1613145997970-db84a7975fbb">
+<img src="https://images.unsplash.com/photo-1613145997970-db84a7975fbb?auto=format&fit=crop&w=800&q=60">
 <div class="card-content">
 <h3>Canelones Premium</h3>
 <p>Doble queso gratinado.</p>
 <div class="price">$6.800</div>
-<button class="add-btn" onclick="addOrder('Canelones Premium',6800)">Agregar</button>
+<button class="add-btn" onclick="addToCart('Canelones Premium',6800)">Agregar</button>
 </div>
-</div></div><div style="text-align:center">
-<a class="whatsapp-btn" href="https://wa.me/5492664508808" target="_blank">📲 Pedir por WhatsApp</a>
-</div><button class="admin-btn" onclick="openAdmin()">Pedidos</button>
+</div></div><button class="admin-btn" onclick="openAdmin()">Pedidos</button>
 
+</div><div class="cart-box">
+<h4>🛒 Tu Pedido</h4>
+<div id="cartItems"></div>
+<strong id="cartTotal">Total: $0</strong>
+<button class="cart-btn" onclick="confirmOrder()">Confirmar pedido</button>
 </div><div id="adminPanel">
 <h2 style="text-align:center">📦 Panel del Dueño</h2><div class="dashboard">
 <div class="stat">
@@ -103,54 +111,86 @@ footer{background:#222;color:white;text-align:center;padding:25px;margin-top:40p
 </div>
 </div><div id="ordersList"></div><div style="text-align:center;margin-top:30px">
 <button onclick="closeAdmin()">Cerrar</button>
-</div>
+<button onclick="clearOrders()" style="margin-left:10px;background:#c62828;color:white;border:none;padding:10px 16px;border-radius:8px;cursor:pointer">Borrar todos</button>
+<button onclick="closeDay()" style="margin-left:10px;background:#1976d2;color:white;border:none;padding:10px 16px;border-radius:8px;cursor:pointer">Cerrar día</button>
+</div><h3 style="text-align:center;margin-top:40px">📅 Historial de Ventas</h3>
+<div id="historyList" style="max-width:700px;margin:20px auto"></div>
 </div><a class="float-wa" href="https://wa.me/5492664508808" target="_blank">💬</a>
 
 <footer>
 <p>Pedidos por WhatsApp | 12:00 a 23:00</p>
 </footer><script>
+let cart=[];
+
 let orders = JSON.parse(localStorage.getItem('orders') || '[]');
 let totalSales = JSON.parse(localStorage.getItem('sales') || '0');
 let orderCounter = JSON.parse(localStorage.getItem('orderCounter') || '0');
+let history = JSON.parse(localStorage.getItem('salesHistory') || '[]');
 
-function playSound(){
-let audio = new Audio('https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg');
-audio.play();
+function addToCart(item,price){
+cart.push({item,price});
+renderCart();
 }
 
-function addOrder(item,price){
-let name = prompt('Nombre del cliente');
-if(!name || name.trim()===''){
-alert('Debes ingresar un nombre');
+function renderCart(){
+let box=document.getElementById('cartItems');
+box.innerHTML='';
+
+let total=0;
+
+cart.forEach(c=>{
+let div=document.createElement('div');
+div.className='cart-item';
+div.innerText=c.item+' - $'+c.price;
+box.appendChild(div);
+
+ total+=c.price;
+});
+
+ document.getElementById('cartTotal').innerText='Total: $'+total.toLocaleString();
+}
+
+function confirmOrder(){
+if(cart.length===0){
+alert('Agrega platos primero');
 return;
 }
 
+let name=prompt('Nombre del cliente');
+if(!name) return;
+
 orderCounter++;
 
-let order = {
+let total=0;
+let items=cart.map(c=>c.item).join(', ');
+
+cart.forEach(c=> total+=c.price);
+
+let order={
 id:orderCounter,
 name:name,
-item:item,
-price:price,
+item:items,
+price:total,
 time:new Date().toLocaleTimeString(),
 done:false
 };
 
 orders.push(order);
-totalSales += price;
+totalSales+=total;
 
 localStorage.setItem('orders',JSON.stringify(orders));
 localStorage.setItem('sales',JSON.stringify(totalSales));
 localStorage.setItem('orderCounter',JSON.stringify(orderCounter));
 
-playSound();
+cart=[];
+renderCart();
 
-alert('Pedido #' + orderCounter + ' agregado para ' + name);
+alert('Pedido enviado');
 }
 
 function openAdmin(){
-let pass = prompt('Clave de administrador');
-if(pass === '2255'){
+let pass=prompt('Clave administrador');
+if(pass==='2255'){
 showOrders();
 document.getElementById('adminPanel').style.display='block';
 }
@@ -161,9 +201,40 @@ document.getElementById('adminPanel').style.display='none';
 }
 
 function markDone(index){
-orders[index].done = true;
+orders[index].done=true;
 localStorage.setItem('orders',JSON.stringify(orders));
 showOrders();
+}
+
+function clearOrders(){
+if(confirm('Borrar todos los pedidos?')){
+orders=[];
+totalSales=0;
+orderCounter=0;
+localStorage.clear();
+showOrders();
+}
+}
+
+function closeDay(){
+if(orders.length===0){alert('No hay pedidos');return}
+
+let today=new Date().toLocaleDateString();
+
+history.push({date:today,orders:orders.length,sales:totalSales});
+
+localStorage.setItem('salesHistory',JSON.stringify(history));
+
+orders=[];
+totalSales=0;
+orderCounter=0;
+
+localStorage.removeItem('orders');
+localStorage.removeItem('sales');
+localStorage.removeItem('orderCounter');
+
+showOrders();
+showHistory();
 }
 
 function showOrders(){
@@ -175,25 +246,39 @@ let div=document.createElement('div');
 div.className='order';
 
 let text=document.createElement('span');
-text.innerText = '#'+o.id+' - '+o.name+' pidió '+o.item+' ('+o.time+')';
+text.innerText='#'+o.id+' '+o.name+' pidió '+o.item+' ($'+o.price+')';
 
 let btn=document.createElement('button');
 btn.className='done-btn';
-btn.innerText = o.done ? 'Entregado' : 'Marcar entregado';
-btn.disabled = o.done;
-btn.onclick = ()=>markDone(i);
+btn.innerText=o.done?'Entregado':'Marcar';
+btn.disabled=o.done;
+btn.onclick=()=>markDone(i);
 
-if(o.done){
-text.style.textDecoration='line-through';
-}
+if(o.done){text.style.textDecoration='line-through'}
 
  div.appendChild(text);
  div.appendChild(btn);
  list.appendChild(div);
 });
 
- document.getElementById('totalOrders').innerText = orders.length;
- document.getElementById('totalSales').innerText = '$'+ totalSales.toLocaleString();
+ document.getElementById('totalOrders').innerText=orders.length;
+ document.getElementById('totalSales').innerText='$'+totalSales.toLocaleString();
+
+ showHistory();
+}
+
+function showHistory(){
+let list=document.getElementById('historyList');
+if(!list) return;
+
+list.innerHTML='';
+
+history.slice().reverse().forEach(h=>{
+let div=document.createElement('div');
+div.className='order';
+div.innerText=h.date+' — Pedidos: '+h.orders+' — Ventas: $'+h.sales;
+list.appendChild(div);
+});
 }
 </script></body>
-  </html>
+</html>
