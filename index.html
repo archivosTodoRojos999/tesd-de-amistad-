@@ -2,99 +2,100 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Sobrevivir a la Escuela Marcelino Blanco</title>
+<title>Escuela Marcelino H Blanco</title>
 
 <style>
 
 html,body{
+margin:0;
 height:100%;
 overflow:hidden;
-}
-
-body{
-font-family: Arial;
-background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+font-family:Arial;
+background:black;
 color:white;
-text-align:center;
-margin:0;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-}
-
-h1{
-padding:10px;
-font-size:34px;
 }
 
 #video{
-width:900px;
-max-width:90%;
 position:relative;
+width:100%;
+height:100vh;
 }
 
 #imagen{
 width:100%;
-height:450px;
+height:100%;
 object-fit:cover;
-border-radius:12px;
-transition:opacity 1s;
+transition:opacity 1.5s, transform 6s;
 }
 
-/* SUBTITULO */
+#overlay{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.35);
+}
+
+#titulo{
+position:absolute;
+top:40px;
+left:50%;
+transform:translateX(-50%);
+font-size:40px;
+font-weight:bold;
+letter-spacing:2px;
+}
 
 #subtitulo{
 position:absolute;
-bottom:20px;
-left:0;
-right:0;
-font-size:22px;
+bottom:60px;
+left:50%;
+transform:translateX(-50%);
+width:70%;
+text-align:center;
+font-size:26px;
 background:rgba(0,0,0,0.6);
-padding:12px;
-border-radius:8px;
+padding:15px;
+border-radius:10px;
 }
 
-/* LOGO FIJO */
-
-#logoEscuela{
+#logo{
 position:absolute;
-top:10px;
-left:10px;
+top:20px;
+left:20px;
 display:flex;
 align-items:center;
 gap:10px;
 background:rgba(0,0,0,0.6);
-padding:6px 12px;
-border-radius:12px;
-z-index:10;
+padding:8px 14px;
+border-radius:14px;
 }
 
-#logoEscuela img{
-width:55px;
-height:55px;
+#logo img{
+width:70px;
+height:70px;
 object-fit:contain;
 background:white;
-padding:3px;
+padding:5px;
 border-radius:50%;
 }
 
-#logoEscuela span{
+#logo span{
 font-weight:bold;
 }
 
-/* BOTON */
-
-button{
-margin-top:20px;
-padding:14px 25px;
+#boton{
+position:absolute;
+bottom:20px;
+right:20px;
+padding:14px 24px;
 font-size:18px;
 border:none;
 border-radius:10px;
-background:linear-gradient(45deg,#00c3ff,#4facfe);
-cursor:pointer;
+background:#00c3ff;
 color:white;
-font-weight:bold;
+cursor:pointer;
 }
 
 </style>
@@ -102,26 +103,28 @@ font-weight:bold;
 
 <body>
 
-<h1>¡Sobrevivir a la Escuela Marcelino Blanco!</h1>
-
 <div id="video">
 
-<!-- LOGO (NO CAMBIA) -->
-<div id="logoEscuela">
-<img src="logo-marcelino.png">
-<span>Marcelino Blanco</span>
+<img id="imagen" src="https://images.unsplash.com/photo-1580582932707-520aed937b7b">
+
+<div id="overlay"></div>
+
+<div id="titulo">
+Escuela Marcelino H Blanco
 </div>
 
-<!-- IMAGEN DEL VIDEO -->
-<img id="imagen" src="https://images.unsplash.com/photo-1580582932707-520aed937b7b">
+<div id="logo">
+<img src="logo.png">
+<span>La Paz</span>
+</div>
 
 <div id="subtitulo">
 Presiona iniciar para comenzar
 </div>
 
-</div>
+<button id="boton" onclick="iniciar()">▶ Iniciar</button>
 
-<button onclick="iniciar()">▶ Iniciar</button>
+</div>
 
 <audio id="musica" loop>
 <source src="musica.mp3" type="audio/mpeg">
@@ -134,45 +137,46 @@ let imagenes=[
 "https://images.unsplash.com/photo-1596495578065-6e0763fa1178",
 "https://images.unsplash.com/photo-1503676260728-1c00da094a0b",
 "https://images.unsplash.com/photo-1509062522246-3755977927d7",
-"https://images.unsplash.com/photo-1523240795612-9a054b0db644",
-"https://images.unsplash.com/photo-1577896851231-70ef18881754"
+"https://images.unsplash.com/photo-1523240795612-9a054b0db644"
 ];
+
+/* PROMPT PARA ALUMNOS DE 1° AÑO */
 
 let textos=[
 
-"Hola chicos, bienvenidos a la escuela Marcelino Blanco. Soy Luciano Sala y estoy aquí para ayudarlos a comenzar este nuevo año.",
+"Hola chicos. Bienvenidos a la Escuela Número 4 042 Marcelino H Blanco. Si estás en primer año de secundaria, este es el comienzo de una nueva etapa en tu vida.",
 
-"La escuela es como un juego. Tendrán desafíos, harán amigos y aprenderán muchas cosas nuevas.",
+"Sabemos que al principio todo puede parecer nuevo. Nuevas materias, nuevos profesores y nuevos compañeros.",
 
-"No se preocupen si al principio no saben todo. Eso es parte de estar en primer año.",
+"Pero no se preocupen. Poco a poco van a ir aprendiendo, adaptándose y descubriendo todo lo que esta escuela tiene para ofrecer.",
 
-"Algunos consejos para sobrevivir: no tengan miedo de preguntar, hagan amigos y trabajen en equipo.",
+"Aquí van a hacer nuevos amigos, aprender cosas interesantes y vivir muchas experiencias que los van a ayudar a crecer.",
 
-"Recuerden que la escuela es un lugar para aprender, crecer y divertirse.",
+"Un consejo muy importante: no tengan miedo de preguntar, participar en clase y trabajar en equipo con sus compañeros.",
 
-"Buena suerte chicos. Vamos a hacer que este año sea inolvidable."
+"La secundaria es un lugar para aprender, pero también para compartir, divertirse y prepararse para el futuro.",
+
+"Les deseamos un gran comienzo en primer año. Bienvenidos a la Escuela Marcelino H Blanco. ¡Que tengan un excelente año!"
 
 ];
 
 let i=0;
 
-/* INICIAR */
-
 function iniciar(){
+
+document.getElementById("boton").style.display="none";
 
 let musica=document.getElementById("musica");
 musica.volume=0.25;
 musica.play();
 
-reproducirEscena();
+escena();
 
 }
 
-/* ESCENA */
+function escena(){
 
-function reproducirEscena(){
-
-if(i>=textos.length) return;
+if(i>=textos.length)return;
 
 let img=document.getElementById("imagen");
 let subt=document.getElementById("subtitulo");
@@ -181,34 +185,33 @@ img.style.opacity=0;
 
 setTimeout(()=>{
 
-img.src=imagenes[i];   // SOLO cambia esta imagen
+img.src=imagenes[i];
+img.style.opacity=1;
+img.style.transform="scale(1.08)";
+
 subt.innerText=textos[i];
 
-img.style.opacity=1;
+leer(textos[i]);
 
-leerTexto(textos[i]);
-
-},500);
+},800);
 
 }
 
-/* VOZ */
-
-function leerTexto(texto){
+function leer(texto){
 
 speechSynthesis.cancel();
 
 let voz=new SpeechSynthesisUtterance(texto);
 
 voz.lang="es-ES";
-voz.rate=0.95;
-voz.pitch=0.5;
+voz.rate=1;
+voz.pitch=1;
 
 voz.onend=function(){
 
 i++;
 
-setTimeout(reproducirEscena,500);
+setTimeout(escena,1000);
 
 };
 
