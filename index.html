@@ -1,25 +1,118 @@
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html><html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>IA con Voz y Texto</title>
+  <meta charset="UTF-8">
+  <title>Hacker Interface</title>
+  <style>
+    body {
+      background-color: black;
+      color: #00ff00;
+      font-family: "Courier New", monospace;
+      margin: 0;
+      overflow: hidden;
+    }#terminal {
+  padding: 20px;
+  font-size: 16px;
+  white-space: pre-line;
+}
+
+.cursor {
+  display: inline-block;
+  width: 10px;
+  background: #00ff00;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
+}
+
+.glitch {
+  color: #00ff00;
+  text-shadow: 2px 2px red;
+  animation: glitch 1s infinite;
+}
+
+@keyframes glitch {
+  0% { text-shadow: 2px 2px red; }
+  50% { text-shadow: -2px -2px blue; }
+  100% { text-shadow: 2px 2px red; }
+}
+
+  </style>
 </head>
 <body>
-    <h1>Escribe un mensaje</h1>
-    <input type="text" id="userInput" placeholder="Escribe aquí tu mensaje">
-    <button onclick="hablar()">Enviar</button>
-    <p id="respuesta"></p>
+  <div id="terminal"></div>  <script>
+    const text = [
+      "Iniciando sistema...",
+      "Conectando a servidor seguro...",
+      "Acceso denegado...",
+      "Bypass de seguridad...",
+      "Acceso concedido ✔",
+      "Descargando datos...",
+      "[██████████] 100%",
+      "",
+      "Bienvenido, usuario.",
+      "Sistema comprometido..."
+    ];
 
-    <script>
-        function hablar() {
-            const texto = document.getElementById('userInput').value;
-            const respuesta = "Tu mensaje fue: " + texto;
-            document.getElementById('respuesta').innerText = respuesta;
+    let i = 0;
+    let j = 0;
+    const speed = 40;
+    const terminal = document.getElementById("terminal");
 
-            const synth = window.speechSynthesis;
-            const utterance = new SpeechSynthesisUtterance(respuesta);
-            synth.speak(utterance);
+    function type() {
+      if (i < text.length) {
+        if (j < text[i].length) {
+          terminal.innerHTML += text[i].charAt(j);
+          j++;
+          setTimeout(type, speed);
+        } else {
+          terminal.innerHTML += "\n";
+          i++;
+          j = 0;
+          setTimeout(type, 500);
         }
-    </script>
-</body>
+      } else {
+        terminal.innerHTML += "\n>_";
+      }
+    }
+
+    type();
+
+    // Fondo tipo "Matrix"
+    const canvas = document.createElement("canvas");
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const letters = "01";
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+
+    const drops = [];
+    for (let x = 0; x < columns; x++) drops[x] = 1;
+
+    function draw() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#0F0";
+      ctx.font = fontSize + "px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
+          drops[i] = 0;
+
+        drops[i]++;
+      }
+    }
+
+    setInterval(draw, 33);
+  </script></body>
 </html>
