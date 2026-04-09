@@ -3,17 +3,12 @@
 <head>
 <meta charset="UTF-8">
 
-<!-- 🔒 SIN ZOOM -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>SENCI PRO</title>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* {margin:0;padding:0;box-sizing:border-box;}
 
 body {
   font-family: monospace;
@@ -26,204 +21,292 @@ body {
   align-items: center;
 }
 
-/* CONTENEDOR */
+/* FONDO */
+#fondo {
+  position: fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  z-index:-1;
+}
+
 .container {
-  display: flex;
-  gap: 12px;
-  width: 95%;
-  max-width: 800px;
+  display:flex;
+  gap:12px;
+  width:95%;
+  max-width:900px;
 }
 
-/* PANEL */
-.box, .resultado {
-  width: 50%;
-  padding: 18px;
-  border: 2px solid #00eaff;
-  background: black;
-  box-shadow: 0 0 20px #00eaff;
+.box, .resultado, .vipPanel {
+  width:50%;
+  padding:18px;
+  border:2px solid #00eaff;
+  background:black;
+  box-shadow:0 0 20px #00eaff;
 }
 
-/* RESULTADO */
-.resultado {
-  display: none;
-}
+.resultado, .vipPanel {display:none;}
 
-/* INPUTS */
 input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  background: black;
-  border: 1px solid #00eaff;
-  color: #00eaff;
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  background:black;
+  border:1px solid #00eaff;
+  color:#00eaff;
 }
 
-/* BOTONES */
 button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  background: black;
-  border: 1px solid #00eaff;
-  color: #00eaff;
-  cursor: pointer;
-  transition: 0.2s;
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  background:black;
+  border:1px solid #00eaff;
+  color:#00eaff;
+  cursor:pointer;
+  transition:0.2s;
 }
 
-/* EFECTO AL TOCAR */
 button:active {
-  transform: scale(0.95);
-  background: #00eaff;
-  color: black;
-  box-shadow: 0 0 15px #00eaff;
+  transform:scale(0.95);
+  background:#00eaff;
+  color:black;
+  box-shadow:0 0 15px #00eaff;
 }
 
-/* RANGO */
-.range {
-  display: flex;
-  gap: 5px;
+.range {display:flex;gap:5px;}
+.range button.active {background:#00eaff;color:black;}
+
+#loader {display:none;margin-top:10px;}
+
+/* BOTÓN VIP */
+#vipBtn{
+  position:fixed;
+  bottom:10px;
+  right:10px;
+  padding:6px 10px;
+  font-size:10px;
+  opacity:0.3;
+  border:1px solid #00eaff;
 }
 
-.range button.active {
-  background: #00eaff;
-  color: black;
+/* LOGIN VIP */
+#loginVip{
+  display:none;
+  position:fixed;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  background:black;
+  border:2px solid #00eaff;
+  padding:15px;
+  box-shadow:0 0 20px #00eaff;
 }
 
-/* LOADER */
-#loader {
-  display: none;
-  margin-top: 10px;
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-  .container {
-    flex-direction: column;
-  }
-  .box, .resultado {
-    width: 100%;
-  }
+@media(max-width:600px){
+.container{flex-direction:column;}
+.box,.resultado,.vipPanel{width:100%;}
 }
 </style>
 </head>
 
 <body>
 
+<canvas id="fondo"></canvas>
+
 <div class="container">
 
-<!-- IZQUIERDA -->
 <div class="box">
-
 <h2>⚡ SENCI PRO SALITA</h2>
 
-<input id="marca" placeholder="Marca del dispositivo">
-<input id="modelo" placeholder="Modelo del dispositivo">
+<input id="marca" placeholder="Marca">
+<input id="modelo" placeholder="Modelo">
 
 <div class="range">
-  <button id="alta">ALTA</button>
-  <button id="media">MEDIA</button>
-  <button id="baja">BAJA</button>
+<button id="alta">ALTA</button>
+<button id="media">MEDIA</button>
+<button id="baja">BAJA</button>
 </div>
 
 <div id="loader">
-  ⚡ GENERANDO...
-  <div style="height:6px; background:#003; margin-top:8px;">
-    <div id="bar" style="height:100%; width:0%; background:#00eaff;"></div>
-  </div>
+⚡ GENERANDO...
+<div style="height:6px;background:#003;margin-top:8px;">
+<div id="bar" style="height:100%;width:0%;background:#00eaff;"></div>
+</div>
 </div>
 
 <button onclick="generar(true)">CON DPI</button>
 <button onclick="generar(false)">SIN DPI</button>
+</div>
+
+<div class="resultado" id="resultado"></div>
+
+<div class="vipPanel" id="vipPanel"></div>
 
 </div>
 
-<!-- DERECHA -->
-<div class="resultado" id="resultado"></div>
+<!-- BOTÓN VIP -->
+<button id="vipBtn" onclick="abrirVip()">VIP</button>
 
+<!-- LOGIN -->
+<div id="loginVip">
+<input id="userVip" placeholder="Usuario">
+<input id="passVip" placeholder="Clave">
+<button onclick="validarVip()">ENTRAR</button>
 </div>
 
 <script>
-let rango = "";
+let rango="";
 
-document.getElementById("alta").onclick = () => select("ALTA");
-document.getElementById("media").onclick = () => select("MEDIA");
-document.getElementById("baja").onclick = () => select("BAJA");
+alta.onclick=()=>select("ALTA");
+media.onclick=()=>select("MEDIA");
+baja.onclick=()=>select("BAJA");
 
-function select(r) {
-  rango = r;
-  document.querySelectorAll(".range button").forEach(b=>b.classList.remove("active"));
-  document.getElementById(r.toLowerCase()).classList.add("active");
+function select(r){
+rango=r;
+document.querySelectorAll(".range button").forEach(b=>b.classList.remove("active"));
+document.getElementById(r.toLowerCase()).classList.add("active");
 }
 
-function generar(dpi) {
-  let marca = document.getElementById("marca").value;
-  let modelo = document.getElementById("modelo").value;
+function generar(dpi){
+let marca=document.getElementById("marca").value;
+let modelo=document.getElementById("modelo").value;
 
-  if (!marca || !modelo || !rango) {
-    alert("Completa todo");
-    return;
-  }
+if(!marca||!modelo||!rango){alert("Completa todo");return;}
 
-  const loader = document.getElementById("loader");
-  const bar = document.getElementById("bar");
-  const resultado = document.getElementById("resultado");
+const loader=document.getElementById("loader");
+const bar=document.getElementById("bar");
+const resultado=document.getElementById("resultado");
 
-  loader.style.display = "block";
-  resultado.style.display = "none";
-  bar.style.width = "0%";
+loader.style.display="block";
+resultado.style.display="none";
+bar.style.width="0%";
 
-  let progreso = 0;
+let progreso=0;
 
-  let intervalo = setInterval(() => {
-    progreso += 5;
-    bar.style.width = progreso + "%";
+let intervalo=setInterval(()=>{
+progreso+=5;
+bar.style.width=progreso+"%";
 
-    if (progreso >= 100) {
-      clearInterval(intervalo);
-      loader.style.display = "none";
-      resultado.style.display = "block";
+if(progreso>=100){
+clearInterval(intervalo);
+loader.style.display="none";
+resultado.style.display="block";
 
-      let base = marca.length * modelo.length;
-      let mult = rango === "ALTA" ? 1.15 : rango === "MEDIA" ? 1.05 : 0.95;
+function precision(min,max,peso){
+let seed=(marca+modelo).split("").reduce((a,c)=>a+c.charCodeAt(0),0);
+let random=Math.sin(seed*peso)*10000;
+let variacion=random-Math.floor(random);
 
-      function precision(min, max, peso) {
-        let centro = (min + max) / 2;
-        let variacion = (base % peso) - (peso / 2);
-        let valor = centro + variacion * 0.3;
-        return Math.round(Math.max(min, Math.min(valor, max)));
-      }
+let valor=min+(max-min)*variacion;
 
-      const sens = {
-        general: precision(150, 190, 30) * mult,
-        red: precision(120, 170, 20) * mult,
-        x2: precision(110, 160, 18) * mult,
-        x4: precision(100, 150, 15) * mult,
-        boton: precision(45, 70, 10)
-      };
+let headBoost=1+(Math.abs(Math.sin(seed))*0.08);
 
-      for (let key in sens) {
-        sens[key] = Math.round(sens[key]);
-      }
+if(rango==="ALTA"){valor*=1.10*headBoost;}
+else if(rango==="MEDIA"){valor*=1.04*headBoost;}
+else{valor*=0.96*headBoost;}
 
-      resultado.innerHTML = `
+valor+=(Math.cos(seed+peso)*2);
+
+return Math.round(Math.max(min,Math.min(valor,max)));
+}
+
+const sens={
+general:precision(180,200,9),
+red:precision(150,190,13),
+x2:precision(140,185,17),
+x4:precision(130,175,21),
+boton:precision(60,85,5)
+};
+
+resultado.innerHTML=`
 === SENCI GENERADA ===<br>
-RANGO : ${rango}<br>
-MODO : ${dpi ? "CON DPI" : "SIN DPI"}<br>
------------------------<br>
-DISPOSITIVO : ${modelo}<br>
-MARCA : ${marca}<br>
------------------------<br>
-GENERAL : ${sens.general}%<br>
-PUNTO ROJO : ${sens.red}%<br>
-MIRA X2 : ${sens.x2}%<br>
-MIRA X4 : ${sens.x4}%<br>
-BOTON DISP : ${sens.boton}%<br>
-DPI : ${dpi ? "411" : "DEFAULT"}<br>
-🎯 HEADSHOT PRO
+RANGO:${rango}<br>
+DISPOSITIVO:${modelo}<br>
+MARCA:${marca}<br>
+GENERAL:${sens.general}<br>
+ROJO:${sens.red}<br>
+X2:${sens.x2}<br>
+X4:${sens.x4}<br>
+BOTON:${sens.boton}<br>
+DPI:${dpi?"411":"DEFAULT"}<br>
+🎯 HEADSHOT EXTREMO
 `;
-    }
-  }, 50);
 }
+},50);
+}
+
+/* VIP */
+function abrirVip(){
+document.getElementById("loginVip").style.display="block";
+}
+
+function validarVip(){
+let u=document.getElementById("userVip").value;
+let p=document.getElementById("passVip").value;
+
+if(u==="SALITA" && p==="22"){
+document.getElementById("loginVip").style.display="none";
+let vip=document.getElementById("vipPanel");
+vip.style.display="block";
+
+vip.innerHTML=`
+💀 SENCI PROHIBIDA 💀<br>
+GENERAL:200<br>
+ROJO:195<br>
+X2:190<br>
+X4:185<br>
+BOTON:80<br>
+🔥 SOLO HEADSHOT
+`;
+}else{
+alert("Acceso denegado");
+}
+}
+</script>
+
+<script>
+const canvas=document.getElementById("fondo");
+const ctx=canvas.getContext("2d");
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let puntos=[];
+
+for(let i=0;i<80;i++){
+puntos.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*2,
+dx:(Math.random()-0.5)*1.2,
+dy:(Math.random()-0.5)*1.2
+});
+}
+
+function animar(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+puntos.forEach(p=>{
+ctx.beginPath();
+ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+ctx.fillStyle="#00eaff";
+ctx.fill();
+
+p.x+=p.dx;
+p.y+=p.dy;
+
+if(p.x<0||p.x>canvas.width)p.dx*=-1;
+if(p.y<0||p.y>canvas.height)p.dy*=-1;
+});
+
+requestAnimationFrame(animar);
+}
+
+animar();
+
+window.addEventListener("resize",()=>{
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+});
 </script>
 
 </body>
