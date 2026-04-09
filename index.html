@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 
-<!-- 🔥 SIN ZOOM -->
+<!-- 🔒 SIN ZOOM -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>SENCI PRO</title>
@@ -20,7 +20,7 @@ body {
   background: black;
   color: #00eaff;
   height: 100vh;
-  overflow: hidden; /* ❌ SIN SCROLL */
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -34,17 +34,17 @@ body {
   z-index: -1;
 }
 
-/* Caja GRANDE */
+/* Caja */
 .box {
   width: 95%;
-  max-width: 400px; /* 🔥 MÁS GRANDE */
+  max-width: 400px;
   padding: 18px;
   border: 2px solid #00eaff;
   background: rgba(0,0,0,0.9);
   box-shadow: 0 0 25px #00eaff;
 }
 
-/* Inputs IGUAL QUE BOTONES */
+/* Inputs y botones */
 input, button {
   width: 100%;
   padding: 10px;
@@ -66,7 +66,7 @@ input, button {
   color: black;
 }
 
-/* Panel GRANDE */
+/* Panel */
 .panel {
   margin-top: 12px;
   border: 1px solid #00eaff;
@@ -74,7 +74,17 @@ input, button {
   font-size: 13px;
   text-align: left;
   box-shadow: 0 0 15px #00eaff inset;
-  min-height: 180px; /* 🔥 MÁS GRANDE */
+  min-height: 180px;
+}
+
+/* Segunda pantalla */
+#panel2 {
+  display: none;
+}
+
+/* Loader */
+#loader {
+  display: none;
 }
 
 /* Botones abajo */
@@ -87,6 +97,15 @@ input, button {
 button:hover {
   background: #00eaff;
   color: black;
+}
+
+/* Vista dividida en PC */
+@media (min-width: 600px) {
+  #panel, #panel2 {
+    width: 48%;
+    display: inline-block;
+    vertical-align: top;
+  }
 }
 </style>
 </head>
@@ -112,6 +131,19 @@ button:hover {
 === ESPERANDO DATOS ===
 </div>
 
+<!-- 🔥 LOADER -->
+<div id="loader">
+  <div style="border:1px solid #00eaff; padding:10px; text-align:center;">
+    ⚡ GENERANDO SENCI...
+    <div style="height:6px; background:#003; margin-top:10px; overflow:hidden;">
+      <div id="bar" style="height:100%; width:0%; background:#00eaff;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 🔥 SEGUNDA PANTALLA -->
+<div id="panel2" class="panel"></div>
+
 <div class="actions">
   <button onclick="generar(true)">CON DPI</button>
   <button onclick="generar(false)">SIN DPI</button>
@@ -132,7 +164,7 @@ function select(r) {
   document.getElementById(r.toLowerCase()).classList.add("active");
 }
 
-/* 🔥 AJUSTE MARECHAL (HEADSHOT PRO) */
+/* 🔥 GENERADOR CON ANIMACIÓN */
 function generar(dpi) {
   let marca = document.getElementById("marca").value;
   let modelo = document.getElementById("modelo").value;
@@ -142,34 +174,49 @@ function generar(dpi) {
     return;
   }
 
-  let base = marca.length * modelo.length;
+  const loader = document.getElementById("loader");
+  const bar = document.getElementById("bar");
+  const panel2 = document.getElementById("panel2");
 
-  let mult = rango === "ALTA" ? 1.15 : rango === "MEDIA" ? 1.05 : 0.95;
+  loader.style.display = "block";
+  panel2.style.display = "none";
+  bar.style.width = "0%";
 
-  function precision(min, max, peso) {
-    let centro = (min + max) / 2;
-    let variacion = (base % peso) - (peso / 2);
+  let progreso = 0;
 
-    // 🔥 MÁS PRECISO (menos random)
-    let valor = centro + variacion * 0.3;
+  let intervalo = setInterval(() => {
+    progreso += 5;
+    bar.style.width = progreso + "%";
 
-    return Math.round(Math.max(min, Math.min(valor, max)));
-  }
+    if (progreso >= 100) {
+      clearInterval(intervalo);
+      loader.style.display = "none";
+      panel2.style.display = "block";
 
-  const sens = {
-    general: precision(150, 190, 30) * mult,
-    red: precision(120, 170, 20) * mult,
-    x2: precision(110, 160, 18) * mult,
-    x4: precision(100, 150, 15) * mult,
-    boton: precision(45, 70, 10)
-  };
+      let base = marca.length * modelo.length;
+      let mult = rango === "ALTA" ? 1.15 : rango === "MEDIA" ? 1.05 : 0.95;
 
-  for (let key in sens) {
-    sens[key] = Math.round(sens[key]);
-  }
+      function precision(min, max, peso) {
+        let centro = (min + max) / 2;
+        let variacion = (base % peso) - (peso / 2);
+        let valor = centro + variacion * 0.3;
+        return Math.round(Math.max(min, Math.min(valor, max)));
+      }
 
-  document.getElementById("panel").innerHTML = `
-=== SENCI PRO SALITA ===<br>
+      const sens = {
+        general: precision(150, 190, 30) * mult,
+        red: precision(120, 170, 20) * mult,
+        x2: precision(110, 160, 18) * mult,
+        x4: precision(100, 150, 15) * mult,
+        boton: precision(45, 70, 10)
+      };
+
+      for (let key in sens) {
+        sens[key] = Math.round(sens[key]);
+      }
+
+      panel2.innerHTML = `
+=== SENCI GENERADA ===<br>
 RANGO : ${rango}<br>
 MODO : ${dpi ? "CON DPI" : "SIN DPI"}<br>
 -----------------------<br>
@@ -182,11 +229,13 @@ MIRA X2 : ${sens.x2}%<br>
 MIRA X4 : ${sens.x4}%<br>
 BOTON DISP : ${sens.boton}%<br>
 DPI : ${dpi ? "411" : "DEFAULT"}<br>
-🎯 AJUSTE: HEADSHOT PRO
+🎯 HEADSHOT PRO
 `;
+    }
+  }, 50);
 }
 
-/* 🔵 Fondo animado azul flúor */
+/* 🔵 Fondo animado */
 const canvas = document.getElementById("bg");
 const ctx = canvas.getContext("2d");
 
