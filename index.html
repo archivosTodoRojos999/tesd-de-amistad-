@@ -57,10 +57,11 @@ input[type=range]{width:100%;}
 </style></head><body><div class="container">
 <h1>✨ Gerador de Sensi</h1><div class="tabs">
 <div class="tab active" onclick="setTab(this,'normal')">Sensi Normal</div>
-<div class="tab" onclick="setTab(this,'premium')">👑 Sensi Premium</div>
-<div class="tab" onclick="setTab(this,'inspirada')">⚡ Sensi Inspirada</div>
+<div class="tab" onclick="setTab(this,'premium')">👑 Sensi Alta</div>
+<div class="tab" onclick="setTab(this,'inspirada')">⚡ Sensi media</div>
 </div><input id="marca" placeholder="Marca del dispositivo">
-<input id="modelo" placeholder="Modelo del dispositivo"><div class="volver">← Voltar</div><div class="box">
+<input id="modelo" placeholder="Modelo del dispositivo"><div class="volver">← Voltar</div><div class="box"><button onclick="generarSenci()" style="width:100%;padding:10px;margin-bottom:10px;border:none;border-radius:10px;background:#ff2a2a;color:white;font-weight:bold;">🚀 GENERAR SENCI</button>
+
 <div class="titulo">
 <span>SENSIBILIDADE</span>
 <span class="pill" id="tipo">NORMAL</span>
@@ -115,6 +116,10 @@ calcular();
 function update(id,val){
 document.getElementById(id).innerText=val;
 if(id==='boton') document.getElementById('btnSize').innerText=val;
+}
+
+function generarSenci(){
+calcular();
 }
 
 function calcular(){
