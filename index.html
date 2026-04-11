@@ -2,7 +2,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SENCI SALITA</title><style>
+<title>SENCI DE SALITA</title><style>
 body{margin:0;background:#000;font-family:Arial;color:white;position:relative;overflow:hidden;}
 
 /* CAPA DE FONDO ANIMADO */
@@ -66,8 +66,39 @@ animation:flashAnim 0.5s ease;
 100%{box-shadow:0 0 10px #ff2a2a;transform:scale(1);} 
 }
 
+
+
+/* RESPONSIVE PC Y CELULAR */
+@media (max-width: 600px){
+.container{
+  padding:10px;
+}
+.tabs{
+  flex-direction:column;
+}
+.tab{
+  border-radius:0;
+}
+.bottom{
+  flex-direction:column;
+  gap:10px;
+}
+.bottomBox{
+  width:100%;
+}
+}
+
+@media (min-width: 800px){
+.container{
+  max-width:700px;
+}
+.box{
+  padding:25px;
+}
+}
+
 </style></head><body><div class="container">
-<h1>✨ Gerador de Sensi</h1><div class="tabs">
+<h1>✨ SENCI DE SALITA</h1><div class="tabs">
 <div class="tab active" onclick="setTab(this,'normal')">Sensi Normal</div>
 <div class="tab" onclick="setTab(this,'premium')">👑 Sensi Alta</div>
 <div class="tab" onclick="setTab(this,'inspirada')">⚡ Sensi Media</div>
@@ -108,7 +139,7 @@ animation:flashAnim 0.5s ease;
 <div class="anuncio">
 <div class="cerrar" onclick="cerrarAnuncio()">✖</div>
 <div class="titulo-anuncio">🚀 NUEVA ACTUALIZACIÓN</div>
-<p>Se actualizó la SENCI SALITA 🔥</p>
+<p>Se actualizó la SENCI DE SALITA 🔥</p>
 </div>
 </div><script>
 let tipoActual="normal";
